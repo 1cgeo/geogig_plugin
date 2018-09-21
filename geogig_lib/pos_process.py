@@ -27,7 +27,8 @@ class Pos_Process:
             self.user_data['repository_name'],
             self.user_data['database_user_name'],
             self.user_data['database_user_password'],
-            geogig_path
+            geogig_path,
+            self.logger
         )
     
     def export(self):
@@ -73,7 +74,11 @@ class Pos_Process:
 
     def run_process(self):   
         if self.check_connection():
-            self.thread1 = Thread_Process(self.export, self.process_name)
+            self.thread1 = Thread_Process(
+                self.export, 
+                self.process_name,
+                self.logger
+            )
             self.thread1.start()
 
 if __name__ == '__main__':

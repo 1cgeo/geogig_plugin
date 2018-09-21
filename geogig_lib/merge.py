@@ -29,7 +29,8 @@ class Merge:
             self.base_repo['repository_name'],
             self.base_repo['database_user_name'],
             self.base_repo['database_user_password'],
-            geogig_path
+            geogig_path,
+            self.logger
         )
 
     def connectPsycopg2(self):
@@ -46,11 +47,12 @@ class Merge:
         return conn
 
     def export_feature(self, layer, data):
+        self.logger.debug(u"layer : {0} , data : {1}".format(layer, data))
         pg_cursor = self.psycopg2_connection.cursor()
-        pg_cursor.execute(
+        ''' pg_cursor.execute(
             """INSERT INTO %s (%s) VALUES (%s);""",
             (layer, fields, values)
-        )
+        ) '''
 
 
     def merge(self, main, branch):

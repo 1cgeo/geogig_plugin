@@ -26,7 +26,8 @@ class Pre_Process:
             self.user_data['repository_name'],
             self.user_data['database_user_name'],
             self.user_data['database_user_password'],
-            geogig_path
+            geogig_path,
+            self.logger
         )
     
     def bkp_production_db(self):      
@@ -101,9 +102,21 @@ class Pre_Process:
 
     def run_process(self):   
         if self.check_connection():
-            self.thread1 = Thread_Process(self.bkp_production_db, u"{0} : Backup production database".format(self.process_name))
-            self.thread2 = Thread_Process(self.bkp_repository_db, u"{0} : Backup repository database".format(self.process_name))
-            self.thread3 = Thread_Process(self.import_user, u"{0} : Geogig : Import, Add, Commit and Push".format(self.process_name))
+            self.thread1 = Thread_Process(
+                self.bkp_production_db, 
+                u"{0} : Backup production database".format(self.process_name),
+                self.logger
+            )
+            self.thread2 = Thread_Process(
+                self.bkp_repository_db, 
+                u"{0} : Backup repository database".format(self.process_name),
+                self.logger
+            )
+            self.thread3 = Thread_Process(
+                self.import_user, 
+                u"{0} : Geogig : Import, Add, Commit and Push".format(self.process_name),
+                self.logger
+            )
             self.thread1.start()
             self.thread2.start()
             self.thread3.start()
