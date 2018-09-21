@@ -168,6 +168,16 @@ class Branch(object):
             return result
         except Exception as e:
             return e
+    
+    def fetch(self,branchName):
+        self.__checkout()
+        try:
+            command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' fetch origin '+branchName
+            result = subprocess.check_output(command,shell=True)
+            print result
+            return result
+        except Exception as e:
+            return e
 
     def log(self,param=None):
         self.__checkout()
@@ -281,9 +291,12 @@ class Branch(object):
         result = subprocess.check_output(command,shell=True)
         layers = [x.replace('-', '').strip() for x in result.split('\n') if x.strip() != ''][1:]
         for layer in layers:
-            commandIn = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' pg import --table '+layer+' -d '+schema+'/'+layer+' --schema '+schema+' --host '+host+' --port '+port+' --database '+database+' --user '+user+' --password '+password+' --force-featuretype' 
-            result = subprocess.check_output(commandIn,shell=True)
-            print "layer: " + layer + " ok!"
+            try:
+                commandIn = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' pg import --table '+layer+' -d '+schema+'/'+layer+' --schema '+schema+' --host '+host+' --port '+port+' --database '+database+' --user '+user+' --password '+password+' --force-featuretype' 
+                result = subprocess.check_output(commandIn,shell=True)
+                print "layer: " + layer + " ok!"
+            except subprocess.CalledProcessError as e:
+                print e.output
         print "ok!"
 
     def pg_export_schema(self,host,port,database,schema,user,password):

@@ -13,6 +13,6 @@ class Thread_Process(threading.Thread):
    def run(self):
       if exitFlag:
             return
-      print "*STARTING {0}\n".format(self.function_name)
+      print u"*STARTING {0}\n".format(self.function_name)
       self.function()
-      print "#EXITING {0}\n".format(self.function_name)
+      print u"#EXITING {0}\n".format(self.function_name)

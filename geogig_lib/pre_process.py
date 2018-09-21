@@ -4,21 +4,27 @@ from geogig import Repository
 from thread_process import Thread_Process
 from datetime import datetime
 
-class After_Process:
+ 
+class Pre_Process:
    
     def __init__(self, config):
         self.process_name = config['process_name']
         self.user_data = config['user']
-        self.repository_data = config['repository']
+        geogig_path = os.path.join(
+            os.getcwd(),
+            'geogig_bin',
+            'bin',
+            'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
+        )
         self.repository = Repository(
-            self.repository_data['machine_ip'],
-            self.repository_data['machine_port'],
-            self.repository_data['database_name'],
-            self.repository_data['database_schema_name'],
-            self.repository_data['name'],
-            self.repository_data['database_user_name'],
-            self.repository_data['database_user_password'],
-            self.repository_data['geogig_path']
+            self.user_data['machine_ip'],
+            self.user_data['machine_port'],
+            self.user_data['repository_db_name'],
+            self.user_data['repository_schema_name'],
+            self.user_data['repository_name'],
+            self.user_data['database_user_name'],
+            self.user_data['database_user_password'],
+            geogig_path
         )
     
     def bkp_production_db(self):      
@@ -29,7 +35,11 @@ class After_Process:
             m_port = self.user_data['machine_port'],
             db_name = self.user_data['database_name'],
             bkp_path = self.user_data['bkp_path'],
-            bkp_db_name = self.user_data['bkp_database_name']
+            bkp_db_name = u"{0}-{1}-{2}".format(
+                datetime.today().strftime('%Y%m%d'),
+                self.user_data['branch_name'],
+                self.user_data['database_name']
+            )
         )
         os.system(cmd)
       
@@ -41,11 +51,15 @@ class After_Process:
             m_port = self.user_data['machine_port'],
             db_name = self.user_data['database_name'],
             bkp_path = self.user_data['bkp_path'],
-            bkp_repo_name = self.user_data['bkp_repository_name']
+            bkp_repo_name = u"{0}-{1}-{2}".format(
+                datetime.today().strftime('%Y%m%d'),
+                self.user_data['branch_name'],
+                self.user_data['repository_name']
+            )
         )
         os.system(cmd)
 
-    def import_total(self):
+    def import_user(self):
         branch = self.user_data['branch_name']
         for x in range(2):
             self.repository.branches[branch].pg_import_schema(   
@@ -57,14 +71,15 @@ class After_Process:
                 self.user_data['database_user_password']
             
             )
-        if (u'edgv' in self.repository.branches[branch].status()):
+        if (self.repository.branches[branch].status() and u'edgv' in self.repository.branches[branch].status()):
             self.repository.branches[branch].add()
             self.repository.branches[branch].commit(
                 u'commit diario - {0}'.format(branch)
             )
-            repositorio.branches[branch].push(branch)
-        #else:
-        #    print u'nada para commitar em {0}'.format(branch)           
+            if not('base' in self.user_data and self.user_data['base']): 
+                repositorio.branches[branch].push(branch)
+        else:
+            print u'nada para commitar em {0}'.format(branch)           
     
     def check_connection(self):
         try:
@@ -86,33 +101,32 @@ class After_Process:
         if self.check_connection():
             self.thread1 = Thread_Process(self.bkp_production_db, u"{0} : Backup production database".format(self.process_name))
             self.thread2 = Thread_Process(self.bkp_repository_db, u"{0} : Backup repository database".format(self.process_name))
-            self.thread3 = Thread_Process(self.import_total, u"{0} : Geogig : Import, Add, Commit and Push".format(self.process_name))
+            self.thread3 = Thread_Process(self.import_user, u"{0} : Geogig : Import, Add, Commit and Push".format(self.process_name))
             self.thread1.start()
             self.thread2.start()
             self.thread3.start()
 
 if __name__ == '__main__':
-    geogig_path = os.path.join(
-        '.',
-        os.getcwd(),
-        'geogig_bin',
-        'bin',
-        'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
-    )
-    repo = { 
-        'repository' : {
-                'name' : 'repo_origin',
-                'database_user_name' : 'postgres',
-                'database_user_password' : 'senha2',
-                'database_name' : 'repository',
-                'database_schema_name' : 'repo',
-                'machine_ip' : '127.0.0.1',
-                'machine_port' : '5432',
-                'geogig_path' : geogig_path
-            }
-    }
     all_config = [
         #user 1
+        
+        {
+            'process_name' : 'pre process BASE',
+            'user' : {
+                'database_user_name' : 'postgres',
+                'database_user_password' : 'senha2',
+                'database_schema_name' : 'edgv',
+                'database_name' : 'rs_rf1',
+                'bkp_path' : os.getcwd(),
+                'machine_ip' : '127.0.0.1',
+                'machine_port' : '5432',
+                'branch_name' : 'master',
+                'repository_db_name' : 'repository',
+                'repository_schema_name' : 'repo',
+                'repository_name' : 'repo_origin',
+                'base' : True,
+            }
+        },
         {
             'process_name' : 'pre process user1',
             'user' : {
@@ -121,21 +135,17 @@ if __name__ == '__main__':
                 'database_schema_name' : 'edgv',
                 'database_name' : 'user1',
                 'bkp_path' : os.getcwd(),
-                'bkp_database_name' : 'user1-db-20182020',
-                'bkp_repository_name' : 'user1-repo-20182020',
                 'machine_ip' : '127.0.0.1',
                 'machine_port' : '5432',
                 'branch_name' : 'master',
-                'repository_name' : 'repo_user1',
-                'repository_schema_name' : 'user1_repo'
+                'repository_db_name' : 'user1_repo',
+                'repository_schema_name' : 'repo',
+                'repository_name' : 'repo_user1'
             }
         }
        
     ]
     for config in all_config:
-        print config
-        config.update(repo)
-        print config
-        aft_proc = After_Process(config)
-        aft_proc.run_process()
+        p_proc = Pre_Process(config)
+        p_proc.run_process()
   
