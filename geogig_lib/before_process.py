@@ -84,14 +84,12 @@ class After_Process:
 
     def run_process(self):   
         if self.check_connection():
-            #print u"Process '{0}': initializing...".format(self.process_name)
             self.thread1 = Thread_Process(self.bkp_production_db, u"{0} : Backup production database".format(self.process_name))
             self.thread2 = Thread_Process(self.bkp_repository_db, u"{0} : Backup repository database".format(self.process_name))
             self.thread3 = Thread_Process(self.import_total, u"{0} : Geogig : Import, Add, Commit and Push".format(self.process_name))
             self.thread1.start()
             self.thread2.start()
             self.thread3.start()
-            #print u"Process '{0}': started".format(self.process_name)
 
 if __name__ == '__main__':
     geogig_path = os.path.join(
@@ -131,30 +129,13 @@ if __name__ == '__main__':
                 'repository_name' : 'repo_user1',
                 'repository_schema_name' : 'user1_repo'
             }
-        },
-        #user 2
-       """  { 
-            'process_name' : 'pre process user2',
-            'user' : {
-                'branch_name' : 'user2',
-                'database_user_name' : 'postgres',
-                'database_user_password' : '',
-                'database_schema_name' : 'edgv',
-                'database_name' : 'user2',
-                'bkp_path' : os.getcwd(),
-                'bkp_database_name' : 'user2-db-20182019',
-                'bkp_repository_name' : 'user2-repo-20182019',
-                'machine_ip' : '127.0.0.1',
-                'machine_port' : '5432',
-                'repository_branch_name' : 'master',
-                'repository_name' : 'repo',
-                'repository_db_schema_name' : 'repo'
-            }
-           
-        } """
+        }
+       
     ]
     for config in all_config:
+        print config
         config.update(repo)
+        print config
         aft_proc = After_Process(config)
         aft_proc.run_process()
   
