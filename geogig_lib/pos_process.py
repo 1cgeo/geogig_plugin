@@ -3,14 +3,16 @@ import socket, time, sys, os, thread, platform
 from geogig import Repository
 from thread_process import Thread_Process
 from datetime import datetime
-from data_users import ALL_USERS_CONFIG
+from data_users import USERS_REPO
+from log import get_low_logger
  
 class Pos_Process:
    
     def __init__(self, config):
+        self.logger = get_low_logger()
         self.export_count = 0
-        self.process_name = config['process_name']
-        self.user_data = config['user']
+        self.user_data = config
+        self.process_name = u"POS PROCESS - {0} : Fetch, export, import database".format(self.user_data['branch_name'])
         geogig_path = os.path.join(
             os.getcwd(),
             'geogig_bin',
@@ -30,6 +32,8 @@ class Pos_Process:
     
     def export(self):
         branch = self.user_data['branch_name']
+        if not(branch == 'master'):
+            self.repository.add_branch(branch)
         if not('base' in self.user_data and self.user_data['base']): 
             self.repository.branches[branch].fetch(branch)
         self.repository.branches[branch].pg_export_schema(
@@ -47,14 +51,13 @@ class Pos_Process:
                 self.user_data['database_schema_name'],
                 self.user_data['database_user_name'],
                 self.user_data['database_user_password']
-            
-            )
+        )
         if (self.repository.branches[branch].status() and u'edgv' in self.repository.branches[branch].status()):
             if self.export_count == 0:
                 self.export()
                 self.export_count += 1
             else:
-                print u'export branch : {0} ERROR!'.format(branch)
+                self.logger.error(u'export branch : {0}'.format(branch)) 
 
     def check_connection(self):
         try:
@@ -70,11 +73,11 @@ class Pos_Process:
 
     def run_process(self):   
         if self.check_connection():
-            self.thread1 = Thread_Process(self.export, u"{0} : Fetch, export, import database".format(self.process_name))
+            self.thread1 = Thread_Process(self.export, self.process_name)
             self.thread1.start()
 
 if __name__ == '__main__':
-    for config in ALL_USERS_CONFIG:
+    for config in USERS_REPO:
         p_proc = Pos_Process(config)
         p_proc.run_process()
   

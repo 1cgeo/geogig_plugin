@@ -3,13 +3,15 @@ import socket, time, sys, os, thread, platform
 from geogig import Repository
 from thread_process import Thread_Process
 from datetime import datetime
-
+from data_users import USERS_REPO
+from log import get_low_logger
  
 class Pre_Process:
    
     def __init__(self, config):
-        self.process_name = config['process_name']
-        self.user_data = config['user']
+        self.logger = get_low_logger()
+        self.user_data = config
+        self.process_name = u"PRE PROCESS - {0}".format(self.user_data['branch_name'])
         geogig_path = os.path.join(
             os.getcwd(),
             'geogig_bin',
@@ -79,8 +81,8 @@ class Pre_Process:
             if not('base' in self.user_data and self.user_data['base']): 
                 repositorio.branches[branch].push(branch)
         else:
-            print u'nada para commitar em {0}'.format(branch)           
-    
+           self.logger.info(u'nada para commitar em {0}'.format(branch))
+            
     def check_connection(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -107,45 +109,7 @@ class Pre_Process:
             self.thread3.start()
 
 if __name__ == '__main__':
-    all_config = [
-        #user 1
-        
-        {
-            'process_name' : 'pre process BASE',
-            'user' : {
-                'database_user_name' : 'postgres',
-                'database_user_password' : 'senha2',
-                'database_schema_name' : 'edgv',
-                'database_name' : 'rs_rf1',
-                'bkp_path' : os.getcwd(),
-                'machine_ip' : '127.0.0.1',
-                'machine_port' : '5432',
-                'branch_name' : 'master',
-                'repository_db_name' : 'repository',
-                'repository_schema_name' : 'repo',
-                'repository_name' : 'repo_origin',
-                'base' : True,
-            }
-        },
-        {
-            'process_name' : 'pre process user1',
-            'user' : {
-                'database_user_name' : 'postgres',
-                'database_user_password' : 'senha2',
-                'database_schema_name' : 'edgv',
-                'database_name' : 'user1',
-                'bkp_path' : os.getcwd(),
-                'machine_ip' : '127.0.0.1',
-                'machine_port' : '5432',
-                'branch_name' : 'master',
-                'repository_db_name' : 'user1_repo',
-                'repository_schema_name' : 'repo',
-                'repository_name' : 'repo_user1'
-            }
-        }
-       
-    ]
-    for config in all_config:
+    for config in USERS_REPO:
         p_proc = Pre_Process(config)
         p_proc.run_process()
   
