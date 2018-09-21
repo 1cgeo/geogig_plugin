@@ -8,8 +8,8 @@ import psycopg2
 from log import get_low_logger
 
 class Repository:
-    def __init__(self,host,port,database,schema,repository,user,password, geogigPath):
-        self.logger = get_low_logger()
+    def __init__(self,host,port,database,schema,repository,user,password, geogigPath, logger=False):
+        self.logger = logger
         self.geogigPath = geogigPath 
         self.repoUrl = "postgresql://{}:{}/{}/{}/{}?user={}&password={}".format(host,port,database,schema,repository,user,password)
         self.branches = {}
@@ -20,9 +20,9 @@ class Repository:
             
             branch_names = [x.strip().replace('* ', '') for x in result.split('\n')][:-1 ]
             for name in branch_names:
-                self.branches[name] = Branch(name,self.geogigPath,self.repoUrl)
+                self.branches[name] = Branch(name,self.geogigPath,self.repoUrl, self.logger)
         except Exception as e:
-            self.logger.error(e)
+            self.logger.error(e) if self.logger else ''
  
     def config(self,username,email):
         try:
@@ -51,7 +51,7 @@ class Repository:
             result = subprocess.check_output(command,shell=True,universal_newlines=True)
             return result
         except Exception as e:
-            self.logger.error(e)
+            self.logger.error(e) if self.logger else ''
 
     def compara_schema(self,host,port,database,schema,user,password):
         #metodo para comparar os atributos das tabelas entre a arvore do repositorio
@@ -116,7 +116,7 @@ class Repository:
             value = item.split('=')[1]
             config[key]=value
         if(config['user.email']!=''):
-            self.logger.error(u'Repository not configured')
+            self.logger.error(u'Repository not configured') if self.logger else ''
         else:
             pass
             
@@ -124,8 +124,8 @@ class Repository:
 
 
 class Branch(object):
-    def __init__(self,branchName, geogigPath, repoUrl):
-        self.logger = get_low_logger()
+    def __init__(self,branchName, geogigPath, repoUrl, logger=False):
+        self.logger = logger
         self.name = branchName
         self.geogigPath = geogigPath
         self.repoUrl = repoUrl
@@ -165,7 +165,7 @@ class Branch(object):
             result = subprocess.check_output(command,shell=True)
             return result
         except Exception as e:
-            self.logger.error(e)
+            self.logger.error(e) if self.logger else ''
             return e
     
     def fetch(self,branchName):
@@ -175,7 +175,7 @@ class Branch(object):
             result = subprocess.check_output(command,shell=True)
             return result
         except Exception as e:
-            self.logger.error(e)
+            self.logger.error(e) if self.logger else ''
             return e
 
     def log(self,param=None):
@@ -216,7 +216,7 @@ class Branch(object):
                 if len(line.split("\t")) > 1:
                     values[layer[idx]] = line.split("\t")[1]
                 else:
-                    self.logger.error(u"Error parse feature {0} {1}".format(idx, line))
+                    self.logger.error(u"Error parse feature {0} {1}".format(idx, line)) if self.logger else ''
         else:
             for att in layer:
                 values[att]= "DELETADO"
@@ -261,7 +261,7 @@ class Branch(object):
         except subprocess.CalledProcessError as exc:
             abort_merge = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' merge --abort'
             abort_merge_run = subprocess.check_output(abort_merge,shell=True,stderr=subprocess.STDOUT,universal_newlines=True)
-            self.logger.error(exc)
+            self.logger.error(exc) if self.logger else ''
             return exc
 
     def merge(self,branchName):
@@ -275,7 +275,7 @@ class Branch(object):
                 conflicts = self.conflicts_list()
                 return conflicts
             else:
-                self.logger.error(exc)
+                self.logger.error(exc) if self.logger else ''
                 return exc
         else:
             return 'Success'
@@ -290,10 +290,10 @@ class Branch(object):
             try:
                 commandIn = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' pg import --table '+layer+' -d '+schema+'/'+layer+' --schema '+schema+' --host '+host+' --port '+port+' --database '+database+' --user '+user+' --password '+password+' --force-featuretype' 
                 result = subprocess.check_output(commandIn,shell=True)
-                self.logger.info(u"Database : {0} layer: {1} {2}".format(database, layer, " ok!")
+                self.logger.info(u"Database : {0} layer: {1} {2}".format(database, layer, " ok!")) if self.logger else ''
             except subprocess.CalledProcessError as e:
-                self.logger.error(e.output)
-        self.logger.info(u"Database : {0} import finished".format(database)
+                self.logger.error(e.output) if self.logger else ''
+        self.logger.info(u"Database : {0} import finished".format(database)) if self.logger else ''
 
     def pg_export_schema(self,host,port,database,schema,user,password):
         self.__checkout()
@@ -310,8 +310,8 @@ class Branch(object):
             for layer in layers:
                 commandIn = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' pg export --host '+host+' --port '+port+' --database '+database+' --user '+user+' --password '+password+' --schema ' + schema +' HEAD:'+schema+'/'+layer+' '+layer+' --overwrite'
                 result = subprocess.check_output(commandIn,shell=True)
-                self.logger.info(u"Database : {0} layer: {1} {2}".format(database, layer, " ok!")
-            self.logger.info("Database : {0} export finished".format(database)
+                self.logger.info(u"Database : {0} layer: {1} {2}".format(database, layer, " ok!")) if self.logger else ''
+            self.logger.info("Database : {0} export finished".format(database)) if self.logger else ''
             #exclusão dos registros no banco de dados que nao estao na arvore
             strCon = 'dbname='+database+' user='+user+' password='+password+' host='+host+' port='+port
             con = psycopg2.connect(strCon)
@@ -319,20 +319,20 @@ class Branch(object):
             cur = con.cursor()
             emptyLayers = set(layersInDb).difference(layers)
             for layer in emptyLayers:
-                self.logger.info(u"excluindo os registros de {0}".format(layer)
+                self.logger.info(u"excluindo os registros de {0}".format(layer)) if self.logger else ''
                 cur.execute("DELETE FROM {}.{};".format(schema,layer))
             cur.close()
             con.close()
 
         except subprocess.CalledProcessError as e:
-            self.logger.error(e)
+            self.logger.error(e) if self.logger else ''
             return e
     
     def status(self):
         self.__checkout()
         command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' status'
         result =  subprocess.check_output(command,shell=True)
-        self.logger.info(result)
+        self.logger.info(result) if self.logger else ''
     
     def commit(self,msg):
         self.__checkout()

@@ -5,7 +5,7 @@ BASE_REPO = {
         'database_user_name' : 'postgres',
         'database_user_password' : 'senha',
         'database_schema_name' : 'edgv',
-        'database_name' : 'reambulacao_db',
+        'database_name' : 'reambulacaodb',
         'bkp_path' : os.getcwd(),
         'machine_ip' : '10.2.1.51',
         'machine_port' : '5432',
@@ -36,6 +36,33 @@ MERGE_BRANCHES = {
     }
 }
 
+''' {
+            'database_user_name' : 'postgres',
+            'database_user_password' : 'senha',
+            'database_schema_name' : 'edgv',
+            'database_name' : 'henriquedb',
+            'bkp_path' : os.getcwd(),
+            'machine_ip' : '10.2.1.51',
+            'machine_port' : '5432',
+            'branch_name' : 'henrique',
+            'repository_db_name' : 'henriquerepo',
+            'repository_schema_name' : 'repositorios',
+            'repository_name' : 'rs_rf1_repo'
+        },
+ '''
+ ''' {
+            'database_user_name' : 'postgres',
+            'database_user_password' : 'senha',
+            'database_schema_name' : 'edgv',
+            'database_name' : 'castrodb',
+            'bkp_path' : os.getcwd(),
+            'machine_ip' : '10.2.1.51',
+            'machine_port' : '5432',
+            'branch_name' : 'castro',
+            'repository_db_name' : 'castrorepo',
+            'repository_schema_name' : 'repositorios',
+            'repository_name' : 'rs_rf1_repo'
+        }, '''
 USERS_REPO = [
         {
             'database_user_name' : 'postgres',
@@ -63,19 +90,7 @@ USERS_REPO = [
             'repository_schema_name' : 'repositorios',
             'repository_name' : 'rs_rf1_repo'
         },
-         {
-            'database_user_name' : 'postgres',
-            'database_user_password' : 'senha',
-            'database_schema_name' : 'edgv',
-            'database_name' : 'henriquedb',
-            'bkp_path' : os.getcwd(),
-            'machine_ip' : '10.2.1.51',
-            'machine_port' : '5432',
-            'branch_name' : 'henrique',
-            'repository_db_name' : 'henriquerepo',
-            'repository_schema_name' : 'repositorios',
-            'repository_name' : 'rs_rf1_repo'
-        },
+         
          {
             'database_user_name' : 'postgres',
             'database_user_password' : 'senha',
@@ -115,19 +130,7 @@ USERS_REPO = [
             'repository_schema_name' : 'repositorios',
             'repository_name' : 'rs_rf1_repo'
         },
-         {
-            'database_user_name' : 'postgres',
-            'database_user_password' : 'senha',
-            'database_schema_name' : 'edgv',
-            'database_name' : 'castrodb',
-            'bkp_path' : os.getcwd(),
-            'machine_ip' : '10.2.1.51',
-            'machine_port' : '5432',
-            'branch_name' : 'castro',
-            'repository_db_name' : 'castrorepo',
-            'repository_schema_name' : 'repositorios',
-            'repository_name' : 'rs_rf1_repo'
-        },
+         
          {
             'database_user_name' : 'postgres',
             'database_user_password' : 'senha',
