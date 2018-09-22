@@ -118,9 +118,12 @@ class Repository:
             self.logger.error(u'Repository not configured') if self.logger else ''
         else:
             pass
-            
-            
-
+    
+    def merge_abort(self):
+        abort_merge = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' merge --abort'
+        abort_merge_run = subprocess.check_output(abort_merge,shell=True,stderr=subprocess.STDOUT,universal_newlines=True)
+        self.logger.error(exc) if self.logger else ''
+        return exc
 
 class Branch(object):
     def __init__(self,branchName, geogigPath, repoUrl, logger=False):
@@ -161,16 +164,6 @@ class Branch(object):
         self.__checkout()
         try:
             command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' pull origin '+branchName
-            result = subprocess.check_output(command,shell=True)
-            return result
-        except Exception as e:
-            self.logger.error(e) if self.logger else ''
-            return e
-    
-    def fetch(self,branchName):
-        self.__checkout()
-        try:
-            command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' fetch origin '+branchName
             result = subprocess.check_output(command,shell=True)
             return result
         except Exception as e:

@@ -80,34 +80,33 @@ class Merge:
                     conflict['camada'] : choices[0]
                 })
                 if true_conflict:
+                    self.logger.debug(u"Geogig Export Features Database")
                     self.export_feature(conflict['camada'], conflict[choices[1]])
+            self.logger.debug(u"Geogig Commit Merge")
             self.repository.branches[main].commit(
                 u'merge - {0}'.format(branch)
             )
             return True
 
-    def check_connection(self):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((
-                self.base_repo['machine_ip'],
-                int(self.base_repo['machine_port'])
-            ))
-            s.shutdown(2)
-            return True
-        except:
-            self.logger.error(u'No connection {0}, {1}'.format(self.base_repo['machine_ip'], self.base_repo['machine_port']))
-            return False
-
     def run_process(self):
-        if self.check_connection():
+        check_conn = Utils().check_connection   
+        if (check_conn(self.base_repo, self.logger) and check_conn(self.conflict_db, self.logger)):
+            count_sucess = 0
             for branch in self.merge_branches:
                 self.logger.info(u'INICIANDO MERGE - {0}'.format(branch))
                 result = self.merge(self.main_branch, branch)
                 if result:
+                    count_sucess += 1
                     self.logger.info(u'FINALIZADO MERGE - {0}'.format(branch))
+                    self.logger.debug(u"Geogig Delete Branch - user : {0}".format(branch))
+                    self.repository.del_branch(branch)
                 else:
-                    self.logger.error(u'ERRO NO MERGE - {0}'.format(branch)) 
+                    self.logger.error(u'ERRO NO MERGE - {0}'.format(branch))
+                    self.logger.debug(u"Geogig Merge Abort")
+                    self.repository.merge_abort()
+                    break
+            if len(self.merge_branches) == count_sucess:
+                [self.repository.add_branch(branch) for branch in self.merge_branches]
     
 if __name__ == '__main__':
     logger =  Utils().get_low_logger()
