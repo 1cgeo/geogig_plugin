@@ -3,13 +3,13 @@ import socket, time, sys, os, thread, platform, psycopg2
 from geogig import Repository
 from thread_process import Thread_Process
 from datetime import datetime
-from data_users import BASE_REPO, MERGE_BRANCHES
-from log import get_low_logger
+from merge_data import BASE_REPO, MERGE_BRANCHES
+from utils import Utils
  
 class Merge:
    
-    def __init__(self, base_repo, merge_branches):
-        self.logger = get_low_logger()
+    def __init__(self, base_repo, merge_branches, logger=False):
+        self.logger = logger
         self.base_repo = base_repo
         self.main_branch = merge_branches['main']
         self.merge_branches = merge_branches['branches']
@@ -47,12 +47,18 @@ class Merge:
         return conn
 
     def export_feature(self, layer, data):
+        del data['data_modificacao']
+        del data['id']
+        data['geom'] = u"SRID=31982;{0}".format(data['geom'])
         self.logger.debug(u"layer : {0} , data : {1}".format(layer, data))
         pg_cursor = self.psycopg2_connection.cursor()
-        ''' pg_cursor.execute(
-            """INSERT INTO %s (%s) VALUES (%s);""",
-            (layer, fields, values)
-        ) '''
+        pg_cursor.execute(
+            """INSERT INTO {0} ({1}) VALUES ({2});""".format(
+                u"{0}.{1}".format(layer.split('/')[0], layer.split('/')[1]), 
+                u",".join(data.keys()), 
+                u",".join(["'{0}'".format(x) for x in data.values()])
+            )
+        )
 
 
     def merge(self, main, branch):
@@ -68,12 +74,16 @@ class Merge:
                     if key not in blacklist and conflict['theirs'][key] != conflict['ours'][key]:
                         true_conflict = True
                 choices = ['theirs', 'ours']
-                if conflicts['theirs'][conflicts['theirs'].keys()[0]] == 'DELETADO'
-                    choices.reverse()
-
-                self.repository.branches[main].merge_features(conflicts['camada'], choice[0])
+                if conflict['ours'].values()[0] == 'DELETADO':
+                    choices = ['ours', 'theirs']
+                self.repository.branches[main].merge_features({
+                    conflict['camada'] : choices[0]
+                })
                 if true_conflict:
-                    self.export_feature(conflict['camada'], conflict[choice(1)])
+                    self.export_feature(conflict['camada'], conflict[choices[1]])
+            self.repository.branches[main].commit(
+                u'merge - {0}'.format(branch)
+            )
             return True
 
     def check_connection(self):
@@ -86,6 +96,7 @@ class Merge:
             s.shutdown(2)
             return True
         except:
+            self.logger.error(u'No connection {0}, {1}'.format(self.base_repo['machine_ip'], self.base_repo['machine_port']))
             return False
 
     def run_process(self):
@@ -99,7 +110,8 @@ class Merge:
                     self.logger.error(u'ERRO NO MERGE - {0}'.format(branch)) 
     
 if __name__ == '__main__':
-    m_proc = Merge(BASE_REPO, MERGE_BRANCHES)
+    logger =  Utils().get_low_logger()
+    m_proc = Merge(BASE_REPO, MERGE_BRANCHES, logger)
     m_proc.run_process()
   
   

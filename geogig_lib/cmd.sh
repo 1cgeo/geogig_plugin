@@ -1,0 +1,1 @@
+/home/debian9/.qgis2/python/plugins/Geogig_PG/geogig_lib/geogig_bin/bin/geogig --repo "postgresql://10.2.1.51:5432/reambulacaorepo/repositorios/rs_rf1_repo?user=postgres&password=postgres" merge alegranzi

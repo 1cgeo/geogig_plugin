@@ -5,7 +5,6 @@ import datetime
 import subprocess
 import os
 import psycopg2
-from log import get_low_logger
 
 class Repository:
     def __init__(self,host,port,database,schema,repository,user,password, geogigPath, logger=False):
@@ -269,11 +268,12 @@ class Branch(object):
         try:
             command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' merge '+branchName
             result = subprocess.check_output(command,shell=True,stderr=subprocess.STDOUT,universal_newlines=True)
-            
         except subprocess.CalledProcessError as exc:
             if ("CONFLICT" in exc.output):
                 conflicts = self.conflicts_list()
                 return conflicts
+            elif "The branch has already been merged." in exc.output:
+                return 'Success'
             else:
                 self.logger.error(exc) if self.logger else ''
                 return exc
@@ -333,6 +333,7 @@ class Branch(object):
         command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' status'
         result =  subprocess.check_output(command,shell=True)
         self.logger.info(result) if self.logger else ''
+        return result
     
     def commit(self,msg):
         self.__checkout()

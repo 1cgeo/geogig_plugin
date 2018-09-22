@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import threading
 import time
-
 exitFlag = 0
 
 class Thread_Process(threading.Thread):
