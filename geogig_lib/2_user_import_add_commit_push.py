@@ -17,16 +17,6 @@ class Pre_Process:
             'bin',
             'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
         )
-        self.pg_dump_path = u"{0}".format(
-            u'export PGPASSWORD="{0}"; pg_dump'.format(self.user_data['database_user_password']) 
-            if  platform.system() == 'Linux' 
-            else 
-                u'''cmd.exe set PGPASSWORD='{0}' && "{1}"'''.format(
-                    self.user_data['pg_dump_path_windows'],
-                    self.user_data['database_user_password']
-                )
-        )
-        self.logger.debug(u"PG_DUMP_PATH : {0} user : {1}".format(self.pg_dump_path, self.user_data['branch_name']))
         self.repository = Repository(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
@@ -74,7 +64,6 @@ class Pre_Process:
 
 if __name__ == '__main__':
     logger = Utils().get_low_logger()
-    for config in USERS_REPO:
-        p_proc = Pre_Process(config, logger)
-        p_proc.run_process()
+    p_proc = Pre_Process(USERS_REPO, logger)
+    p_proc.run_process()
      

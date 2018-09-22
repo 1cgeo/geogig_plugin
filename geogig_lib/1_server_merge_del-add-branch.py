@@ -106,6 +106,7 @@ class Merge:
                     self.repository.merge_abort()
                     break
             if len(self.merge_branches) == count_sucess:
+                self.logger.debug(u"Geogig Add Branches")
                 [self.repository.add_branch(branch) for branch in self.merge_branches]
     
 if __name__ == '__main__':

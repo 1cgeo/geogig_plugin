@@ -4,10 +4,9 @@ import os, sys
 BASE_REPO = {
         'database_user_name' : 'postgres',
         'database_user_password' : 'postgres',
-        'database_name' : 'reambulacaodb',
-        'machine_ip' : '10.2.1.51',
+        'machine_ip' : '10.2.1.1',
         'machine_port' : '5432',
-        'repository_db_name' : 'reambulacaorepo',
+        'repository_db_name' : 'repositorio',
         'repository_schema_name' : 'repositorios',
         'repository_name' : 'rs_rf1_repo'
 }
@@ -15,13 +14,13 @@ BASE_REPO = {
 MERGE_BRANCHES = {
     'main': 'reambulacao',
     'branches': [
-                'alegranzi'
+                'lunardi2'
             ],
     'conflict_db': {
         'database_user_name' : 'postgres',
         'database_user_password' : 'postgres',
         'database_name' : 'conflitos',
-        'machine_ip' : '10.2.1.51',
+        'machine_ip' : '10.2.1.1',
         'machine_port' : '5432'
     },
     'EPSG' : '31982'

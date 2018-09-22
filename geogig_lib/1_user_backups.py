@@ -21,13 +21,12 @@ class Backups:
             u'export PGPASSWORD="{0}"; pg_dump'.format(self.user_data['database_user_password']) 
             if  platform.system() == 'Linux' 
             else 
-                u'''cmd.exe set PGPASSWORD='{0}' && "{1}"'''.format(
-                    self.user_data['pg_dump_path_windows'],
-                    self.user_data['database_user_password']
+                u'''"{0}"'''.format(
+                    self.user_data['pg_dump_path_windows']
                 )
         )
         self.logger.debug(u"PG_DUMP_PATH : {0} user : {1}".format(self.pg_dump_path, self.user_data['branch_name']))
-       
+        self.os = os
     
     def bkp_production_db(self):
         self.logger.info(
@@ -52,7 +51,8 @@ class Backups:
             pg_dump=self.pg_dump_path
         )
         self.logger.debug(u"Backup database cmd : {0} - user : {1}".format(cmd, self.user_data['branch_name']))
-        os.popen(cmd)
+        
+        self.os.popen(cmd)
       
     def bkp_repository_db(self):
         self.logger.info(
@@ -77,7 +77,7 @@ class Backups:
             pg_dump=self.pg_dump_path
         )
         self.logger.debug(u"Backup repository cmd : {0} - user : {1}".format(cmd, self.user_data['branch_name']))
-        os.popen(cmd)
+        self.os.popen(cmd)
  
     def run_process(self):
         utils = Utils()   
@@ -90,7 +90,6 @@ class Backups:
            
 if __name__ == '__main__':
     logger = Utils().get_low_logger()
-    for config in USERS_REPO:
-        bkp = Backups(config, logger)
-        bkp.run_process()
+    bkp = Backups(USERS_REPO, logger)
+    bkp.run_process()
      

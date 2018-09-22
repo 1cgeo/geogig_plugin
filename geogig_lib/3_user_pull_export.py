@@ -32,11 +32,9 @@ class Pos_Process:
     
     def export(self):
         branch = self.user_data['branch_name']
-        if not(branch == 'master'):
-            self.repository.add_branch(branch)
         if not('base' in self.user_data and self.user_data['base']):
-            self.logger.debug(u"Geogig Push - user : {0}".format(branch)) 
-            self.repository.branches[branch].push(branch)
+            self.logger.debug(u"Geogig Pull - user : {0}".format(branch)) 
+            self.repository.branches[branch].pull(branch)
         self.logger.debug(u"Geogig Export - user : {0}".format(branch)) 
         self.repository.branches[branch].pg_export_schema(
             self.user_data['machine_ip'],
@@ -69,7 +67,6 @@ class Pos_Process:
 
 if __name__ == '__main__':
     logger = Utils().get_low_logger()
-    for config in USERS_REPO:
-        p_proc = Pos_Process(config, logger)
-        p_proc.run_process()
+    p_proc = Pos_Process(USERS_REPO, logger)
+    p_proc.run_process()
   
