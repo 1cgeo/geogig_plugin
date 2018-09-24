@@ -4,7 +4,7 @@
 name=Geogig Postgresql
 qgisMinimumVersion=2.18
 description=Sistema de controle de versão
-version=version Version 0.1
+version=version Version 1.0.0
 author=Cesar Soares
 email=cesar.soares@gmail.com
 ; end of mandatory metadata
