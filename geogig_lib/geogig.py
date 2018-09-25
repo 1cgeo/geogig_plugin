@@ -346,6 +346,5 @@ class Branch(object):
             result = subprocess.check_output(command,shell=True)
             addCommand = '{0} --repo "{1}" add {2}'.format(self.geogigPath, self.repoUrl, feat)
             result = subprocess.check_output(addCommand,shell=True)
-        self.commit('merge concluido')
             
     
