@@ -14,7 +14,6 @@ class Repository:
         self.branches = {}
         try:
             command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"' + ' branch'
-            
             result = subprocess.check_output(command,shell=True)
             
             branch_names = [x.strip().replace('* ', '') for x in result.split('\n')][:-1 ]
@@ -29,7 +28,7 @@ class Repository:
             subprocess.check_output(command,shell=True)
             command = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"' +' config --global user.email ' + email
             subprocess.check_output(command,shell=True)
-            result = 'Atualizações realizadas com sucesso!'
+            result = u'Atualizações realizadas com sucesso!'
             
         except Exception as e:
             return e
@@ -305,8 +304,8 @@ class Branch(object):
                 result = subprocess.check_output(commandIn,shell=True)
                 self.logger.debug(u"Export result layer: {0} -> {1}".format(layer, result)) if self.logger else ''
                 self.logger.info(u"Export Database : {0} layer: {1} {2}".format(database, layer, " ok!")) if self.logger else ''
-            self.logger.info("Database : {0} export finished".format(database)) if self.logger else ''
-            #exclusão dos registros no banco de dados que nao estao na arvore
+            self.logger.info(u"Database : {0} export finished".format(database)) if self.logger else ''
+            #exclusao dos registros no banco de dados que nao estao na arvore
             strCon = 'dbname='+database+' user='+user+' password='+password+' host='+host+' port='+port
             con = psycopg2.connect(strCon)
             con.autocommit=True
