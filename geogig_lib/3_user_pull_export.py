@@ -55,8 +55,8 @@ class Pos_Process:
         )
         if (self.repository.branches[branch].status() and u'edgv' in self.repository.branches[branch].status()):
             if self.export_count == 0:
-                self.export()
                 self.export_count += 1
+                self.export()
             else:
                 self.logger.error(u'Export branch : {0}'.format(branch)) 
 

@@ -303,7 +303,8 @@ class Branch(object):
             for layer in layers:
                 commandIn = self.geogigPath + ' --repo ' +'"'+ self.repoUrl+'"'+' pg export --host '+host+' --port '+port+' --database '+database+' --user '+user+' --password '+password+' --schema ' + schema +' HEAD:'+schema+'/'+layer+' '+layer+' --overwrite'
                 result = subprocess.check_output(commandIn,shell=True)
-                self.logger.info(u"Database : {0} layer: {1} {2}".format(database, layer, " ok!")) if self.logger else ''
+                self.logger.debug(u"Export result layer: {0} -> {1}".format(layer, result)) if self.logger else ''
+                self.logger.info(u"Export Database : {0} layer: {1} {2}".format(database, layer, " ok!")) if self.logger else ''
             self.logger.info("Database : {0} export finished".format(database)) if self.logger else ''
             #exclusão dos registros no banco de dados que nao estao na arvore
             strCon = 'dbname='+database+' user='+user+' password='+password+' host='+host+' port='+port
