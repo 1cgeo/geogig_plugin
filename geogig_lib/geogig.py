@@ -337,8 +337,8 @@ class Branch(object):
         except subprocess.CalledProcessError as exc:
             if ("Nothing to commit" in exc.output):
                 result = "Nothing to commit"
-                
-        
+            else:
+                self.logger.error(exc.output) if self.logger else ''
         return result
 
     def merge_features(self, decisionDict):
