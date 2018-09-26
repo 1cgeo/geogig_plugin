@@ -32,9 +32,6 @@ class Pos_Process:
     
     def export(self):
         branch = self.user_data['branch_name']
-        if not('base' in self.user_data and self.user_data['base']):
-            self.logger.debug(u"Geogig Pull - user : {0}".format(branch)) 
-            self.repository.branches[branch].pull(branch)
         self.logger.debug(u"Geogig Export - user : {0}".format(branch)) 
         self.repository.branches[branch].pg_export_schema(
             self.user_data['machine_ip'],
@@ -58,11 +55,15 @@ class Pos_Process:
                 self.export_count += 1
                 self.export()
             else:
-                self.logger.error(u'Export branch : {0}'.format(branch)) 
+                self.logger.error(u'EXPORT NÃO REALIZADO! USER : {0}'.format(branch)) 
 
     def run_process(self):   
         utils = Utils()   
         if utils.check_connection(self.user_data, self.logger):
+            if not('base' in self.user_data and self.user_data['base']):
+                branch = self.user_data['branch_name']
+                self.logger.debug(u"Geogig Pull - user : {0}".format(branch)) 
+                self.repository.branches[branch].pull(branch)
             self.export()
 
 if __name__ == '__main__':
