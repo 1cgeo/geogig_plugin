@@ -3,10 +3,9 @@ import socket, time, sys, os, thread, platform
 from geogig import Repository
 from thread_process import Thread_Process
 from datetime import datetime
-from users_data import USERS_REPO
-from utils import Utils
+from utils import path
  
-class Pre_Process:
+class Import_Add_Commit_Push:
    
     def __init__(self, config, logger=False):
         self.logger = logger
@@ -43,27 +42,24 @@ class Pre_Process:
             
             )
         if (self.repository.branches[branch].status() and u'edgv' in self.repository.branches[branch].status()):
-            self.logger.debug(u"Geogig Add, Commit - user : {0}".format(branch))
             self.repository.branches[branch].add()
             self.repository.branches[branch].commit(
                 u'commit diario - {0}'.format(branch)
             )
-            if not('base' in self.user_data and self.user_data['base']):
-                self.logger.debug(u"Geogig Push : {0}".format(branch)) 
+            self.logger.debug(u"Geogig Add, Commit - user : {0}".format(branch))
+            if not('base' in self.user_data and self.user_data['base']): 
                 self.repository.branches[branch].push(branch)
+                self.logger.debug(u"Geogig Push : {0}".format(branch))
         else:
            self.logger.info(u'Nothing to commit on {0}'.format(branch))
 
     def run_process(self):
-        utils = Utils()   
-        if utils.check_connection(self.user_data, self.logger):
-            self.logger.info(u"STARTING PRE PROCESS {0}".format(self.user_data['branch_name']))
-            utils.create_dir_bkps(self.user_data['bkp_path'])
-            self.import_user()
+        self.logger.info(u"Init Import Add Commit Push(if not base) - user : {0}".format(self.user_data['branch_name']))
+        self.repository.clean_staging_area()
+        self.import_user()
+        self.repository.show_resume_commit_by_tag(u'commit')
+        return True
            
-
 if __name__ == '__main__':
-    logger = Utils().get_low_logger()
-    p_proc = Pre_Process(USERS_REPO, logger)
-    p_proc.run_process()
+    pass
      

@@ -3,10 +3,9 @@ import socket, time, sys, os, thread, platform
 from geogig import Repository
 from thread_process import Thread_Process
 from datetime import datetime
-from users_data import USERS_REPO
-from utils import Utils
+
  
-class Pos_Process:
+class Pull_Export:
    
     def __init__(self, config, logger=False):
         self.logger = logger
@@ -53,21 +52,21 @@ class Pos_Process:
         if (self.repository.branches[branch].status() and u'edgv' in self.repository.branches[branch].status()):
             if self.export_count == 0:
                 self.export_count += 1
+                self.repository.clean_staging_area()
                 self.export()
             else:
-                self.logger.error(u'EXPORT NÃO REALIZADO! USER : {0}'.format(branch)) 
+                self.logger.error(u'EXPORT NÃO REALIZADO! USER : {0}'.format(branch))
+                return False 
+        return True
 
     def run_process(self):   
-        utils = Utils()   
-        if utils.check_connection(self.user_data, self.logger):
-            if not('base' in self.user_data and self.user_data['base']):
-                branch = self.user_data['branch_name']
-                self.logger.debug(u"Geogig Pull - user : {0}".format(branch)) 
-                self.repository.branches[branch].pull(branch)
-            self.export()
+        self.repository.clean_staging_area()
+        if not('base' in self.user_data and self.user_data['base']):
+            branch = self.user_data['branch_name']
+            self.repository.branches[branch].pull(branch)
+            self.logger.debug(u"Geogig Pull - user : {0}".format(branch)) 
+        return self.export()
 
 if __name__ == '__main__':
-    logger = Utils().get_low_logger()
-    p_proc = Pos_Process(USERS_REPO, logger)
-    p_proc.run_process()
+    pass
   
