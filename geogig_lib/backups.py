@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import socket, time, sys, os, thread, platform
-from geogig import Repository
+from repository import Repository
 from thread_process import Thread_Process
 from datetime import datetime
-from users_data import USERS_CONFIG
 from utils import path
  
 class Backups:
@@ -44,7 +43,7 @@ class Backups:
                 )
             )
         )
-        cmd = u'{pg_dump} -U {name} -h {m_ip} -p {m_port} -d {db_name} -f {bkp_path}.sql'.format(
+        cmd = u'{pg_dump} -U {name} -h {m_ip} -p {m_port} -d {db_name} -f {bkp_path}'.format(
             name = self.user_data['database_user_name'],
             m_ip = self.user_data['machine_ip'],
             m_port = self.user_data['machine_port'],

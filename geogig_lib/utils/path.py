@@ -5,6 +5,6 @@ def exist(path):
     return os.path.exists(path)
 
 def create_dir(path):
-    if not(exist_path(path)):
+    if not(exist(path)):
         os.mkdir(path)
 

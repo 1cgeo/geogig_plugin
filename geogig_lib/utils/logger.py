@@ -6,11 +6,12 @@ from datetime import datetime
 
 def get_low_logger():
     formatter = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    log_path = u'{0}/logs/{1}.log'.format(
+        os.getcwd(),
+        datetime.today().strftime('%Y%m%d_%H-%M-%S')
+    )
     handler = logging.FileHandler(
-        u'{0}/logs/{1}.log'.format(
-            os.getcwd(),
-            datetime.today().strftime('%Y%m%d_%H-%M-%S')
-        ), 
+        log_path, 
         mode='w'
     )
     handler.setFormatter(formatter)
@@ -20,4 +21,4 @@ def get_low_logger():
     logger.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     logger.addHandler(screen_handler)
-    return logger
+    return logger, log_path

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import socket, time, sys, os, thread, platform
-from geogig import Repository
+from repository import Repository
 from thread_process import Thread_Process
 from datetime import datetime
 
@@ -52,17 +52,17 @@ class Pull_Export:
         if (self.repository.branches[branch].status() and u'edgv' in self.repository.branches[branch].status()):
             if self.export_count == 0:
                 self.export_count += 1
-                self.repository.clean_staging_area()
+                self.repository.branches[branch].clean_staging_area()
                 self.export()
             else:
                 self.logger.error(u'EXPORT NÃO REALIZADO! USER : {0}'.format(branch))
                 return False 
         return True
 
-    def run_process(self):   
-        self.repository.clean_staging_area()
+    def run_process(self):
+        branch = self.user_data['branch_name']   
+        self.repository.branches[branch].clean_staging_area()
         if not('base' in self.user_data and self.user_data['base']):
-            branch = self.user_data['branch_name']
             self.repository.branches[branch].pull(branch)
             self.logger.debug(u"Geogig Pull - user : {0}".format(branch)) 
         return self.export()

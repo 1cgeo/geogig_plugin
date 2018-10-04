@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import socket, time, sys, os, thread, platform, psycopg2
-from geogig import Repository
+from repository import Repository
 from thread_process import Thread_Process
 from datetime import datetime
 from utils import logger
@@ -14,7 +14,7 @@ class Server_Merge:
         self.merge_branches = merge_branches['branches']
         self.conflict_db = merge_branches['conflict_db']
         self.EPSG = merge_branches['EPSG']
-        self.psycopg2_connection = self.connectPsycopg2()
+        #self.psycopg2_connection = self.connectPsycopg2()
         geogig_path = os.path.join(
             os.getcwd(),
             'geogig_bin',
@@ -59,8 +59,6 @@ class Server_Merge:
                 ",".join(["'{0}'".format(x) for x in data.values()])
             )
         )
-                        
-
 
     def merge(self, main, branch):
         self.repository.clean_staging_area()
@@ -83,9 +81,9 @@ class Server_Merge:
                 self.repository.branches[main].merge_features({
                     conflict[u'camada'] : choices[0]
                 })
-                if true_conflict:
-                    self.export_feature(conflict[u'camada'], conflict[choices[1]])
-                    self.logger.debug(u"Geogig Export Features Database")
+                #if true_conflict:
+                #    self.export_feature(conflict[u'camada'], conflict[choices[1]])
+                #    self.logger.debug(u"Geogig Export Features Database")
             self.repository.branches[main].commit(
                 u'merge - {0}'.format(branch)
             )

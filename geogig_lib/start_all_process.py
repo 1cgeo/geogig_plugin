@@ -2,13 +2,13 @@
 
 from users_data import USERS_CONFIG, SERVER
 from merge_data import MERGE_BRANCHES
-from utils import logger, email, connection
+from utils import logger, smtp, connection
 from backups import Backups
 from import_add_commit_push import Import_Add_Commit_Push
 from server_merge import Server_Merge
 from pull_export import Pull_Export
 
-logger = logger.get_low_logger()
+logger, log_path = logger.get_low_logger()
 
 def check_all_connection():
     count_computers = len(USERS_CONFIG)
@@ -27,7 +27,7 @@ def check_all_connection():
 
 def all_backups():
     for USER in USERS_CONFIG:
-        bkp = Backups(USERS_REPO, logger)
+        bkp = Backups(USER, logger)
         result = bkp.run_process()
         if not(result):
             return False
@@ -71,8 +71,8 @@ def start():
     logger.debug(u"Todos os processos realizados com sucesso!")
 
 if __name__ == '__main__':
-    try:
-        msg = start()
-    except:
-        pass
-    #email.send_email(u"email", u"password", u"message", u"email_dest")
+    #try:
+    msg = start()
+    #except:
+    #    pass
+    
