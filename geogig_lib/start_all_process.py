@@ -68,11 +68,11 @@ def start():
     if not(pull_export()):
         logger.erro(u"Erro Pull Export")
         return 
-    logger.debug(u"Todos os processos realizados com sucesso!")
+    logger.debug(u"All successful processes!")
 
 if __name__ == '__main__':
-    #try:
-    msg = start()
-    #except:
-    #    pass
-    
+    try:
+        msg = start()
+    except:
+        pass
+    smtp.send_email(u"email_origin", u"password", [u"email_dest"], log_path)

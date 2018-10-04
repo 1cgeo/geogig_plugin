@@ -10,12 +10,7 @@ class Backups:
     def __init__(self, config, logger=False):
         self.logger = logger
         self.user_data = config
-        geogig_path = os.path.join(
-            os.getcwd(),
-            'geogig_bin',
-            'bin',
-            'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
-        )
+        geogig_path = path.get_geogig_path()
         self.pg_dump_path = u"{0}".format(
             u'export PGPASSWORD="{0}"; pg_dump'.format(self.user_data['database_user_password']) 
             if  platform.system() == 'Linux' 

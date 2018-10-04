@@ -11,12 +11,7 @@ class Pull_Export:
         self.logger = logger
         self.export_count = 0
         self.user_data = config
-        geogig_path = os.path.join(
-            os.getcwd(),
-            'geogig_bin',
-            'bin',
-            'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
-        )
+        geogig_path = path.get_geogig_path()
         self.repository = Repository(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
@@ -55,7 +50,7 @@ class Pull_Export:
                 self.repository.branches[branch].clean_staging_area()
                 self.export()
             else:
-                self.logger.error(u'EXPORT NÃO REALIZADO! USER : {0}'.format(branch))
+                self.logger.error(u'UNREALIZED EXPORT! USER : {0}'.format(branch))
                 return False 
         return True
 

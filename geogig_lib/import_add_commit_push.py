@@ -10,12 +10,7 @@ class Import_Add_Commit_Push:
     def __init__(self, config, logger=False):
         self.logger = logger
         self.user_data = config
-        geogig_path = os.path.join(
-            os.getcwd(),
-            'geogig_bin',
-            'bin',
-            'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
-        )
+        geogig_path = path.get_geogig_path()
         self.repository = Repository(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
@@ -79,9 +74,9 @@ class Import_Add_Commit_Push:
             self.logger.info(u'Nothing to commit on {0}'.format(branch)) if self.logger else ''
         
     def run_process(self):
-        self.logger.info(u"Init Import, Add, Commit and Push(if not base) - user : {0}".format(self.user_data['branch_name'])) if self.logger else ''
-        self.repository.branches[self.user_data['branch_name']].clean_staging_area()
         branch = self.user_data['branch_name']
+        self.logger.info(u"Init Import, Add, Commit and Push(if not base) - user : {0}".format(branch)) if self.logger else ''
+        self.repository.branches[branch].clean_staging_area()
         self.pg_import()
         approved_layers_list, repproved_layers_list = self.spatial_test()
         if len(repproved_layers_list) > 0:
@@ -90,7 +85,7 @@ class Import_Add_Commit_Push:
         else:
             self.add_commit()
         self.push()
-        self.repository.branches[self.user_data['branch_name']].show_resume_commit_by_tag(u'commit')
+        self.repository.branches[branch].show_resume_commit_by_tag(u'commit')
         return True
            
 if __name__ == '__main__':
