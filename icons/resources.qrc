@@ -1,5 +1,0 @@
-<RCC>
-  <qresource prefix="/plugins/geogig_pg/icons" >
-     <file>geogig.png</file>
-  </qresource>
-</RCC>
