@@ -66,9 +66,8 @@ class Import_Add_Commit_Push:
     
     def push(self):
         branch = self.user_data['branch_name']
-        if not('base' in self.user_data and self.user_data['base']): 
-            self.repository.branches[branch].push(branch)
-            self.logger.debug(u"Geogig Push : {0}".format(branch)) if self.logger else ''
+        self.repository.branches[branch].push(branch)
+        self.logger.debug(u"Geogig Push : {0}".format(branch)) if self.logger else ''
     
     def add_commit(self, layers_list=False):
         branch = self.user_data['branch_name']
@@ -82,15 +81,18 @@ class Import_Add_Commit_Push:
         self.repository.branches[branch].clean_staging_area()
         if not(self.pg_import()):
            return False
-        status = self.repository.branches[branch].status() 
+        status = self.repository.branches[branch].status()
         if ( status and u'edgv' in status):
-            approved_layers_list, repproved_layers_list = self.spatial_test()
-            if len(repproved_layers_list) > 0:
-                self.add_commit([ row[1] for row in approved_layers_list])
-                self.repository.branches[branch].clean_staging_area()
+            if not('base' in self.user_data):
+                approved_layers_list, repproved_layers_list = self.spatial_test()
+                if len(repproved_layers_list) > 0:
+                    self.add_commit([ row[1] for row in approved_layers_list])
+                    self.repository.branches[branch].clean_staging_area()
+                else:
+                    self.add_commit()
+                self.push()
             else:
                 self.add_commit()
-            self.push()
             ''' self.repository.branches[branch].insert_uuid_on_db(   
                 self.user_data['machine_ip'],
                 self.user_data['machine_port'],

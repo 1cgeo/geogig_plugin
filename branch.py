@@ -92,7 +92,6 @@ class Branch(object):
                     aux[u'date'] = ':'.join(line.split(':')[1:]).strip()
             if line.find(u'Merge') > -1:
                     aux[u'Merge'] = line.split(':')[1].strip()
-
         logs.append(aux)
         return logs
         
@@ -245,22 +244,6 @@ class Branch(object):
         pg_cursor.execute(u'DELETE FROM public.aux_geogig;')
         pg_cursor.close()
         self.logger.debug(u"Clean UUID on database!") if self.logger else ''
-
-    def get_all_data_staging_work(self):
-        cmd = '{0} --repo "{1}" status  --limit 10000000'.format(self.geogigPath, self.repoUrl)
-        result = subprocess.check_output(cmd, shell=True)
-        data_table = []
-        data_input = result.split('\n')
-        for i, line in enumerate(data_input):
-            if len(line.split(' ')[-1].split('/')) >= 3:
-                status =  line.split(' ')[-3]
-                layer_name =  line.split(' ')[-1].strip().split('/')[1]
-                fid =  line.split(' ')[-1].strip().split('/')[-1]
-                layer_path =  line.split(' ')[-1].strip()
-                locate = 'HEAD:' if status == 'removed' else ''
-                data_table.append([status, layer_name, fid, layer_path, locate])
-        self.logger.debug(u"Amount : {0}".format(result.split('#')[-1])) if self.logger else ''
-        return data_table
 
     def pg_import_layer(self, layer, schema, host, port, database, user, password):
         try:
@@ -436,4 +419,18 @@ class Branch(object):
                 wkt = line.split(':')[-1].strip()
                 return wkt
 
-           
+    def get_all_data_staging_work(self):
+        cmd = '{0} --repo "{1}" status  --limit 10000000'.format(self.geogigPath, self.repoUrl)
+        result = subprocess.check_output(cmd, shell=True)
+        data_table = []
+        data_input = result.split('\n')
+        for i, line in enumerate(data_input):
+            if len(line.split(' ')[-1].split('/')) >= 3:
+                status =  line.split(' ')[-3]
+                layer_name =  line.split(' ')[-1].strip().split('/')[1]
+                fid =  line.split(' ')[-1].strip().split('/')[-1]
+                layer_path =  line.split(' ')[-1].strip()
+                locate = 'HEAD:' if status == 'removed' else ''
+                data_table.append([status, layer_name, fid, layer_path, locate])
+        self.logger.debug(u"Amount : {0}".format(result.split('#')[-1])) if self.logger else ''
+        return data_table
