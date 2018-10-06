@@ -26,7 +26,7 @@ class Import_Add_Commit_Push:
     def spatial_test(self):
         approved_layers_list = []
         repproved_layers_list = [] 
-        if not('base' in self.user_data and self.user_data['base']):
+        if not('base' in self.user_data):
             branch = self.user_data['branch_name']
             self.repository.branches[branch].spatial_test(   
                 self.user_data['machine_ip'],
@@ -66,7 +66,7 @@ class Import_Add_Commit_Push:
     
     def push(self):
         branch = self.user_data['branch_name']
-        if not('base' in self.user_data and self.user_data['base']): 
+        if not('base' in self.user_data): 
             self.repository.branches[branch].push(branch)
             self.logger.debug(u"Geogig Push : {0}".format(branch)) if self.logger else ''
     
