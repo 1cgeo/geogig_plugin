@@ -53,6 +53,9 @@ class Server_Merge:
                 self.repository.branches[main].merge_features({
                     conflict[u'camada'] : choices[0]
                 })
+            if true_conflict:
+                    self.logger.debug(u"Geogig Export Features Database")
+                    self.export_feature(conflict['camada'], conflict[choices[1]])
             self.repository.branches[main].commit(
                 u'merge - {0}'.format(branch)
             )

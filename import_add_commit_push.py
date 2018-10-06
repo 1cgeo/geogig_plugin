@@ -28,7 +28,7 @@ class Import_Add_Commit_Push:
         repproved_layers_list = [] 
         if not('base' in self.user_data):
             branch = self.user_data['branch_name']
-            self.repository.branches[branch].spatial_test(   
+            self.repository.branches[branch].spatial_test(   #teste apenas molduras nao finalizadas branch
                 self.user_data['machine_ip'],
                 self.user_data['machine_port'],
                 self.user_data['database_name'],
@@ -37,7 +37,7 @@ class Import_Add_Commit_Push:
             )
             return approved_layers_list, repproved_layers_list
         else:
-            self.logger.debug(u"NO SPATIAL TEST AT 'BASE'") if self.logger else ''
+            self.logger.debug(u"NO SPATIAL TEST AT 'BASE'") if self.logger else ''#teste apenas molduras nao finalizadas BASE
             return approved_layers_list, repproved_layers_list
     
     def pg_import(self):

@@ -4,7 +4,9 @@ import os, sys
 MERGE_BRANCHES = {
     'main': 'reambulacao',
     'branches': [
-                'alegranzi'
+                'alegranzi',
+                'nepomuceno',
+                'lunardi'
             ],
     'conflict_db': {
         'database_user_name' : 'postgres',

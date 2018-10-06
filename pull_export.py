@@ -37,7 +37,7 @@ class Pull_Export:
             self.user_data['database_user_password']
         )
         self.logger.debug(u"Geogig Import - user : {0}".format(branch)) 
-        self.repository.branches[branch].pg_import_schema(   
+        ''' self.repository.branches[branch].pg_import_schema(   
                 self.user_data['machine_ip'],
                 self.user_data['machine_port'],
                 self.user_data['database_name'],
@@ -52,7 +52,8 @@ class Pull_Export:
                 self.export()
             else:
                 self.logger.error(u'UNREALIZED EXPORT! USER : {0}'.format(branch))
-                return False
+                return False '''
+                
         ''' self.repository.branches[branch].insert_uuid_on_db(   
                 self.user_data['machine_ip'],
                 self.user_data['machine_port'],

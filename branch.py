@@ -432,5 +432,5 @@ class Branch(object):
                 layer_path =  line.split(' ')[-1].strip()
                 locate = 'HEAD:' if status == 'removed' else ''
                 data_table.append([status, layer_name, fid, layer_path, locate])
-        self.logger.debug(u"Amount : {0}".format(result.split('#')[-1])) if self.logger else ''
+        self.logger.debug(u"Amount : {0}".format(len(data_table))) if self.logger else ''
         return data_table
