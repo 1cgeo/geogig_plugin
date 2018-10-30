@@ -1,5 +1,5 @@
 
-    Geogig Plugin - Version 1.0.0
+    Geogig Plugin - Version 0.1.0
     =======================
 
     

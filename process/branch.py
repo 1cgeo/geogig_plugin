@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from osgeo import ogr
 import subprocess, psycopg2, os, datetime, sys, re, tempfile, time
 from utils import progressbar
 import multiprocessing
@@ -174,8 +173,10 @@ class Branch(object):
             command = u'{0} --repo "{1}" reset --hard'.format(self.geogigPath, self.repoUrl)
             result = subprocess.check_output(command,shell=True,stderr=subprocess.STDOUT,universal_newlines=True)
             self.logger.debug(u"Clean staging area") if self.logger else ''
+            return True
         except subprocess.CalledProcessError as e:
             self.logger.error(e.output) if self.logger else ''  
+            return False
     
     def show_resume_commit_by_tag(self, tag):
         self.__checkout()
@@ -207,11 +208,13 @@ class Branch(object):
                 password
             )
         )
+        conn.autocommit=True
         return conn.cursor()
     
     def get_first_uuid(self):
+        self.__checkout()
         try:
-            command = u'{0} --repo "{1}" log --oneline'.format(self.geogigPath, self.repoUrl)
+            command = u'{0} --repo "{1}" log --oneline -n 1'.format(self.geogigPath, self.repoUrl)
             result = subprocess.check_output(command,shell=True,stderr=subprocess.STDOUT,universal_newlines=True)
             head_uuid = result.split(' ')[0]
             return head_uuid
@@ -219,29 +222,28 @@ class Branch(object):
             self.logger.debug(u"Erro on get first uuid!") if self.logger else ''
             self.logger.error(e.output) if self.logger else ''
 
-
     def isEqualHEADs(self, host,port,database,user,password):
-        #self.__checkout()
-        #head_uuid = self.get_first_uuid()
-        #pg_cursor = self.get_pg_cursor(host,port,database,user,password)
-        #pg_cursor.execute(u"select commit_uuid from aux_geogig ;")
-        #db_uuid = pg_cursor.fetchall()[0][0].strip()
-        #pg_cursor.close()
-        #return head_uuid == db_uuid
-        return True
+        head_uuid = self.get_first_uuid()
+        pg_cursor = self.get_pg_cursor(host,port,database,user,password)
+        pg_cursor.execute(u"select uuid from aux_geogig ORDER BY id DESC LIMIT 1;")
+        result = pg_cursor.fetchall()
+        pg_cursor.close()
+        if(len(result)>0):
+            db_uuid = result[0][0].strip()
+            return head_uuid == db_uuid
+        return False
     
     def insert_uuid_on_db(self, host,port,database,user,password, op_type):
         self.__checkout()
-        self.clean_table_on_db()
         head_uuid = self.get_first_uuid()
         pg_cursor = self.get_pg_cursor(host,port,database,user,password)
-        pg_cursor.execute(u"INSERT INTO public.aux_geogig VALUES('{0}', '{1}');".format(op_type, head_uuid))
+        pg_cursor.execute(u"INSERT INTO public.aux_geogig(operacao, uuid) VALUES('{0}', '{1}');".format(op_type, head_uuid))
         pg_cursor.close()
         self.logger.debug(u"Inserting UUID on database!") if self.logger else ''
 
-    def clean_table_on_db(self):
+    def clean_table_on_db(self, host,port,database,user,password):
         pg_cursor = self.get_pg_cursor(host,port,database,user,password)
-        pg_cursor.execute(u'DELETE FROM public.aux_geogig;')
+        pg_cursor.execute(u"DELETE FROM public.aux_geogig;")
         pg_cursor.close()
         self.logger.debug(u"Clean UUID on database!") if self.logger else ''
 
@@ -261,8 +263,10 @@ class Branch(object):
             result = subprocess.check_output(commandIn,shell=True)    
             self.logger.debug(u"Import - database : {0}, layer: {1}, user : {2}".format(database, layer, self.name)) if self.logger else ''
         except subprocess.CalledProcessError as e:
-            self.logger.debug(u"REPLAY - Import - database : {0}, layer: {1}, user : {2}".format(database, layer, self.name)) if self.logger else ''
-            self.pg_import_layer(layer, schema, host, port, database, user, password)
+            self.logger.error(u"ERRO IMPORT DATABASE: {0}, layer: {1}, user : {2}".format(database, layer, self.name)) if self.logger else ''
+            self.logger.error(e)
+            self.clean_staging_area()
+            raise Exception(u'Erro de exportação na layer {0}'.format(layer))
 
     def pg_import_schema(self,host,port,database,schema,user,password):
         self.__checkout()
@@ -284,12 +288,12 @@ class Branch(object):
             self.pg_import_layer(layer, schema, host, port, database, user, password)
         self.logger.debug(u"Finished import - database : {0}, user : {1}".format(database, self.name)) if self.logger else ''
     
-    def clean_records(self, host,port,database,user,password,schema,layersInDb,layers):
+    def clean_all_database(self, host,port,database,user,password):
         cursor = self.get_pg_cursor(host,port,database,user,password)
-        emptyLayers = set(layersInDb).difference(layers)
-        for layer in emptyLayers:
-            cursor.execute(u"DELETE FROM {}.{};".format(schema,layer))
-            self.logger.info(u"REGISTRATION EXCLUDED : {0}".format(layer)) if self.logger else ''
+        cursor.execute(u"SELECT public.cgeo_delete_all();")
+        #self.logger.info(u"clean return {0}".format(cursor.fetchall()[0][0])) if self.logger else ''
+        result = cursor.fetchall()[0][0]
+        self.logger.info(u"{1} CLEAN ALL DATABASE : {0}".format(database, 'ERROR' if not(result) else '')) if self.logger else ''
         cursor.close()
 
     def pg_export_layer(self, layer, schema, host, port, database, user, password):
@@ -313,6 +317,7 @@ class Branch(object):
     def pg_export_schema(self,host,port,database,schema,user,password):
         self.__checkout()
         layers = []
+        #self.clean_all_database(host,port,database,user,password)
         try:
             listLayersInDb = u'{0}  --repo "{1}" pg list --host {2} --port {3} --database {4} --schema {5} --user {6} --password {7}'.format(
                 self.geogigPath, 
@@ -334,7 +339,17 @@ class Branch(object):
             for layer in layers:
                 self.pg_export_layer(layer, schema, host, port, database, user, password)
             self.logger.debug(u"Finished export - database : {0}, user : {1}".format(database, user)) if self.logger else ''
-            self.clean_records(host,port,database,user,password,schema,layersInDb,layers)
+            #exclusao dos registros no banco de dados que nao estao na arvore
+            strCon = 'dbname='+database+' user='+user+' password='+password+' host='+host+' port='+port
+            con = psycopg2.connect(strCon)
+            con.autocommit=True
+            cur = con.cursor()
+            emptyLayers = set(layersInDb).difference(layers)
+            for layer in emptyLayers:
+                self.logger.info(u"excluindo os registros de {0}".format(layer)) if self.logger else ''
+                cur.execute("DELETE FROM {}.{};".format(schema,layer))
+            cur.close()
+            con.close()
         except subprocess.CalledProcessError as e:
             self.logger.error(e.output) if self.logger else ''
             return e
@@ -355,6 +370,7 @@ class Branch(object):
                 result = "Nothing to commit"
             else:
                 self.logger.error(exc.output) if self.logger else ''
+                raise Exception(exc.output)
         self.logger.debug(u"Commit : {0}".format(result)) if self.logger else ''
         return result
 
@@ -373,43 +389,6 @@ class Branch(object):
         print_repproved = u"\n".join([ u"{} - {}".format(row[0], row[1]) for row in repproved_layers_paths])
         self.logger.debug(u'LAYERS APPROVED BRANCH : {0} : \n{1}'.format(self.name, print_approved)) if self.logger and print_approved else ''
         self.logger.debug(u'LAYERS REPPROVED BRANCH : {0} : \n{1}'.format(self.name, print_repproved)) if self.logger and print_repproved else ''
-
-    def get_frames(self, host,port,database,user,password):
-        pg_cursor = self.get_pg_cursor(host,port,database,user,password)
-        pg_cursor.execute('select mi, st_asewkt(geom) from edgv.aux_moldura_a;')
-        workspaces = { data[0].strip() : data[1].split(';')[1].strip() for data in pg_cursor.fetchall() }
-        pg_cursor.close()
-        return  [ ogr.CreateGeometryFromWkt(workspaces[key]) for key in workspaces if self.name in key.lower()]
-
-    def spatial_test(self, host,port,database,user,password):
-        self.__checkout()
-        self.logger.debug(u"Loading data to spatial test...") if self.logger else ''
-        frames = self.get_frames(host,port,database,user,password)
-        table_without_wkt = self.get_all_data_staging_work()
-        self.logger.debug(u"Data loaded!") if self.logger else ''
-        self.logger.debug(u"Initiating space test ...") if self.logger else ''
-        approved_layers_paths = []
-        repproved_layers_paths = []
-        all_lyrs = len(table_without_wkt)
-        for i, row in enumerate(table_without_wkt):
-            wkt = self.get_wkt(row[-2], row[-1])
-            is_approved = False
-            for frame in frames:
-                if frame.Intersects(ogr.CreateGeometryFromWkt(wkt)):
-                    approved_layers_paths.append([row[0], row[3]])
-                    is_approved = True
-            if not(is_approved):
-                repproved_layers_paths.append([row[0], row[3]])
-            msg = u"{2}# Geometry : {0} , status : {1}".format(row[3], u"APPROVED" if is_approved else u"REPPROVED", i)
-            self.logger.debug(msg) if self.logger else ''
-        msg = u"Completed spatial test - result - Approved : {0}, Reproved : {1}, Total : {2}".format(
-                len(approved_layers_paths), 
-                len(repproved_layers_paths), 
-                len(table_without_wkt)
-            )
-        self.logger.debug(msg) if self.logger else ''
-        self.show_resume_spatial_test(approved_layers_paths , repproved_layers_paths)
-        return approved_layers_paths , repproved_layers_paths 
 
     def get_wkt(self, layer_path, locate):
         cmd = '{0} --repo "{1}" show {2}{3}'.format(self.geogigPath, self.repoUrl, locate, layer_path)
@@ -434,3 +413,30 @@ class Branch(object):
                 data_table.append([status, layer_name, fid, layer_path, locate])
         self.logger.debug(u"Amount : {0}".format(len(data_table))) if self.logger else ''
         return data_table
+
+    def get_recents_commits(self):
+        output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'log', '--author', self.name])
+        commits = []
+        for line in output.split('\n'):
+            if len(commits) == 2:
+                break
+            elif 'Commit' in line:
+                commits.append(line.split(' ')[-1])
+        return commits
+
+    def get_summary(self):
+        commits = self.get_recents_commits()
+        output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'diff', commits[0], commits[1]])
+        summary = {}
+        for line in output.split('\n'):
+            values = line.split(' ')
+            operation = values[-3] if len(values) > 2 and values[-3].isupper() else ''
+            layer = values[-1] if operation else ''
+            if operation and len(layer.split('/')) == 3:
+                layer = layer.split('/')[1]
+                if layer in summary:
+                    summary[layer][operation]+=1
+                else:
+                    summary[layer] = {'A' : 0, 'R' : 0, 'M' : 0}
+                    summary[layer][operation]+=1
+        return summary, commits[0]

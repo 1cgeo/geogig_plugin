@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-import socket, time, sys, os, thread, platform
+import socket, time, sys, os, platform
 from repository import Repository
-from thread_process import Thread_Process
 from datetime import datetime
 from utils import path
  
@@ -87,8 +86,3 @@ class Backups:
         if result_b1 and result_b2:
             return True
         return False
-           
-           
-if __name__ == '__main__':
-    pass
-     

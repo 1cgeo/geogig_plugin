@@ -10,7 +10,7 @@ def create_dir(path):
 
 def get_geogig_path():
     geogig_path = os.path.join(
-        os.getcwd(),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
         'geogig_bin',
         'bin',
         'geogig' if  platform.system() == 'Linux' else 'geogig.bat'

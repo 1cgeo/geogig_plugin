@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 import socket, time, sys, os, thread, platform
 from repository import Repository
-from thread_process import Thread_Process
 from datetime import datetime
 from utils import path
 
  
 class Pull_Export:
    
-    def __init__(self, config, logger=False):
+    def __init__(self, config, pull, logger=False):
         self.logger = logger
         self.export_count = 0
         self.user_data = config
+        self.pull = pull
+        self.branch = self.user_data['branch_name']
         geogig_path = path.get_geogig_path()
         self.repository = Repository(
             self.user_data['machine_ip'],
@@ -26,9 +27,9 @@ class Pull_Export:
         )
     
     def export(self):
-        branch = self.user_data['branch_name']
-        self.logger.debug(u"Geogig Export - user : {0}".format(branch)) 
-        self.repository.branches[branch].pg_export_schema(
+        result = True
+        self.logger.debug(u"Geogig Export - user : {0}".format(self.branch)) if self.logger else ''
+        self.repository.branches[self.branch].pg_export_schema(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
             self.user_data['database_name'],
@@ -36,8 +37,8 @@ class Pull_Export:
             self.user_data['database_user_name'],
             self.user_data['database_user_password']
         )
-        self.logger.debug(u"Geogig Import - user : {0}".format(branch)) 
-        ''' self.repository.branches[branch].pg_import_schema(   
+        self.logger.debug(u"Geogig Import - user : {0}".format(self.branch)) if self.logger else ''
+        self.repository.branches[self.branch].pg_import_schema(   
                 self.user_data['machine_ip'],
                 self.user_data['machine_port'],
                 self.user_data['database_name'],
@@ -45,33 +46,33 @@ class Pull_Export:
                 self.user_data['database_user_name'],
                 self.user_data['database_user_password']
         )
-        if (self.repository.branches[branch].status() and u'edgv' in self.repository.branches[branch].status()):
-            if self.export_count == 0:
-                self.export_count += 1
-                self.repository.branches[branch].clean_staging_area()
-                self.export()
-            else:
-                self.logger.error(u'UNREALIZED EXPORT! USER : {0}'.format(branch))
-                return False '''
-                
-        ''' self.repository.branches[branch].insert_uuid_on_db(   
+        count_list = len(self.repository.branches[self.branch].get_all_data_staging_work())
+        if count_list > 0 :
+            self.logger.error(u'EXPORT FAILED! USER : {0}'.format(self.branch))
+            self.logger.debug(u"STATUS : {0}".format(self.repository.branches[self.branch].status())) if self.logger else ''
+            result = False
+        if result:
+            self.repository.branches[self.branch].clean_table_on_db(   
+                self.user_data['machine_ip'],
+                self.user_data['machine_port'],
+                self.user_data['database_name'],
+                self.user_data['database_user_name'],
+                self.user_data['database_user_password']
+            )
+            self.repository.branches[self.branch].insert_uuid_on_db(   
                 self.user_data['machine_ip'],
                 self.user_data['machine_port'],
                 self.user_data['database_name'],
                 self.user_data['database_user_name'],
                 self.user_data['database_user_password'],
                 u'EXPORT'
-        ) '''
-        return True
+            )
+        self.repository.branches[self.branch].clean_staging_area()
+        return result
 
     def run_process(self):
-        branch = self.user_data['branch_name']   
-        self.repository.branches[branch].clean_staging_area()
-        if not('base' in self.user_data and self.user_data['base']):
-            self.repository.branches[branch].pull(branch)
-            self.logger.debug(u"Geogig Pull - user : {0}".format(branch)) 
+        self.repository.branches[self.branch].clean_staging_area()
+        if self.pull:
+            self.repository.branches[self.branch].pull(self.branch)
+            self.logger.debug(u"Geogig Pull - user : {0}".format(self.branch)) 
         return self.export()
-
-if __name__ == '__main__':
-    pass
-  

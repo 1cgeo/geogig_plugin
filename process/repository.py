@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from shapely.wkt import loads as geom2wkt
 import subprocess, psycopg2, os, datetime, sys, re, tempfile
 from branch import Branch
 
@@ -27,6 +26,20 @@ class Repository:
             self.logger.debug(u"CONFIG REPOSITORY") if self.logger else '' 
         except subprocess.CalledProcessError as e:
             self.logger.error(e.output) if self.logger else ''
+
+    def get_commits(self):
+        output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'log', '--oneline'])
+        commits = []
+        for line in output.split('\n'):
+            commit = line.split(' ')[0]
+            commits.append(commit)
+        return commits
+
+
+    def reset_commit(self, position):
+        commits = self.get_commits()
+        command = u'{0} --repo "{1}" reset {2}'.format(self.geogigPath, self.repoUrl, commits[position])
+        subprocess.check_output(command,shell=True)
             
     def init(self):
         try:
