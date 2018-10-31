@@ -25,5 +25,5 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(e)
     finally:
-        
-        smtp.send_email_with_attach(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "cesar.soares@gmail.com"], 'Commit', log_path)
+        pass
+        #smtp.send_email_with_attach(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "cesar.soares@gmail.com"], 'Commit', log_path)

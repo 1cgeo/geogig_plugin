@@ -40,6 +40,7 @@ class Repository:
         commits = self.get_commits()
         command = u'{0} --repo "{1}" reset {2}'.format(self.geogigPath, self.repoUrl, commits[position])
         subprocess.check_output(command,shell=True)
+        self.logger.debug(u"Reset commit to --> {}".format(commits[position])) if self.logger else ''
             
     def init(self):
         try:
