@@ -94,7 +94,7 @@ class Server_Merge:
 
     def export_conflicts_data(self, branch):
         if self.conflicts_json:
-            conflicts_dir_path = os.path.join(os.getcwd(), '..', '5_MERGE', 'conflicts_json')
+            conflicts_dir_path = os.path.join(os.getcwd(), '5_MERGE', 'conflicts_json')
             path.create_dir(conflicts_dir_path)
             conflicts_path_file = os.path.join(conflicts_dir_path, u'{0}_{1}.json'.format(datetime.today().strftime('%Y%m%d_%H-%M-%S'), branch))
             with open(conflicts_path_file, 'w') as outfile:
@@ -115,7 +115,7 @@ class Server_Merge:
                 self.repository.merge_abort()
                 self.logger.error(u'ERROR MERGE ABORT - BRANCH : {0}'.format(branch))
                 break
-            self.export_conflicts_data(branch)
+            #self.export_conflicts_data(branch)
         self.repository.branches[self.main_branch].show_resume_commit_by_tag(u'merge')
         if len(self.merge_branches) == count_sucess:
             [self.repository.add_branch(branch) for branch in self.merge_branches]

@@ -27,7 +27,7 @@ class Import_Add_Commit_Push:
     def connectPsycopg2(self):
         conn = psycopg2.connect(
             u"""dbname='{0}' user='{1}' host='{2}' port='{3}' password='{4}'""".format(
-                self.user_data['database_name'], 
+                self.user_data['repository_db_name'], 
                 self.user_data['database_user_name'], 
                 self.user_data['machine_ip'], 
                 self.user_data['machine_port'], 
@@ -59,7 +59,7 @@ class Import_Add_Commit_Push:
         self.logger.debug(u"Export summary commit - user : {}".format(self.branch)) if self.logger else ''
 
 
-    def pg_import(self):
+    def pg_import(self, check_commit=True):
         result = self.repository.branches[self.branch].isEqualHEADs(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
@@ -67,6 +67,7 @@ class Import_Add_Commit_Push:
             self.user_data['database_user_name'],
             self.user_data['database_user_password']
         )
+        result = True if not(check_commit) else result
         if result:
             self.logger.debug(u"Geogig Import - user : {}".format(self.branch)) if self.logger else ''
             self.repository.branches[self.branch].pg_import_schema(   
@@ -107,7 +108,7 @@ class Import_Add_Commit_Push:
            return False
         if self.check_status():
             self.add_commit()
-            if not(self.pg_import()):
+            if not(self.pg_import(check_commit=False)):
                 return False
             if self.check_status():
                 self.abort_process()

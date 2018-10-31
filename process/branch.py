@@ -383,13 +383,6 @@ class Branch(object):
             result = subprocess.check_output(addCommand,shell=True)
             self.logger.debug(u"Add - repository : {0}, feature : {1}".format(self.repoUrl, feat)) if self.logger else ''
 
-    def show_resume_spatial_test(self, approved_layers_paths , repproved_layers_paths):
-        self.logger.debug(u"***RESULT TEST SPATIAL***") if self.logger else ''
-        print_approved = u"\n".join([ u"{} - {}".format(row[0], row[1]) for row in approved_layers_paths])
-        print_repproved = u"\n".join([ u"{} - {}".format(row[0], row[1]) for row in repproved_layers_paths])
-        self.logger.debug(u'LAYERS APPROVED BRANCH : {0} : \n{1}'.format(self.name, print_approved)) if self.logger and print_approved else ''
-        self.logger.debug(u'LAYERS REPPROVED BRANCH : {0} : \n{1}'.format(self.name, print_repproved)) if self.logger and print_repproved else ''
-
     def get_wkt(self, layer_path, locate):
         cmd = '{0} --repo "{1}" show {2}{3}'.format(self.geogigPath, self.repoUrl, locate, layer_path)
         result = subprocess.check_output(cmd, shell=True)
@@ -415,16 +408,17 @@ class Branch(object):
         return data_table
 
     def get_recents_commits(self):
-        output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'log', '--author', self.name])
+        output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'log', '--oneline'])
         commits = []
         for line in output.split('\n'):
             if len(commits) == 2:
                 break
-            elif 'Commit' in line:
-                commits.append(line.split(' ')[-1])
+            commit = line.split(' ')[0]
+            commits.append(commit)
         return commits
 
     def get_summary(self):
+        self.__checkout()
         commits = self.get_recents_commits()
         output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'diff', commits[0], commits[1]])
         summary = {}
