@@ -408,7 +408,8 @@ class Branch(object):
         return data_table
 
     def get_recents_commits(self):
-        output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'log', '--oneline'])
+        cmd = '{0} --repo "{1}" log  --oneline'.format(self.geogigPath, self.repoUrl)
+        output = subprocess.check_output(cmd)
         commits = []
         for line in output.split('\n'):
             if len(commits) == 2:
@@ -420,7 +421,8 @@ class Branch(object):
     def get_summary(self):
         self.__checkout()
         commits = self.get_recents_commits()
-        output = subprocess.check_output([self.geogigPath, '--repo', self.repoUrl, 'diff', commits[0], commits[1]])
+        cmd = '{0} --repo "{1}" diff {2} {3}'.format(self.geogigPath, self.repoUrl, commits[0], commits[1])
+        output = subprocess.check_output(cmd)
         summary = {}
         for line in output.split('\n'):
             values = line.split(' ')
