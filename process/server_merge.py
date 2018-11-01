@@ -14,8 +14,7 @@ class Server_Merge:
         self.merge_branches = merge_branches
         self.conflict_db = conflict_db
         self.EPSG = epsg
-        self.conflicts_json = { 'conflicts_data' : []}
-        self.psycopg2_connection = self.connectPsycopg2()
+        self.pg_cursor = self.connectPsycopg2()
         geogig_path = path.get_geogig_path()
         self.repository = Repository(
             self.base_repo['machine_ip'],
@@ -40,19 +39,17 @@ class Server_Merge:
             )
         )
         conn.set_session(autocommit=True)
-        return conn
+        return conn.cursor()
 
     def export_feature(self, layer, data):
         del data['data_modificacao']
         del data['id']
         data['geom'] = u"SRID={1};{0}".format(data['geom'], self.EPSG)
         self.logger.debug(u"layer : {0} , data : {1}".format(layer, data))
-        pg_cursor = self.psycopg2_connection.cursor()
         values = []
         for x in data.values():
             values += ["'{0}'".format(x.decode("utf-8"))] if x else ['NULL']
-
-        pg_cursor.execute(
+        self.pg_cursor.execute(
             u"""INSERT INTO {0} ({1}) VALUES ({2});""".format(
                 u"{0}.{1}".format(layer.split('/')[0], layer.split('/')[1]), 
                 u",".join(data.keys()), 
@@ -85,22 +82,11 @@ class Server_Merge:
                 if true_conflict:
                     self.export_feature(conflict['camada'], conflict[choices[1]])
                     self.logger.debug(u"Geogig export conflicts on database")
-                    self.conflicts_json['conflicts_data'].append({conflict['camada'] : conflict[choices[1]]})
             self.repository.branches[main].commit(
                 u'merge - {0}'.format(branch)
             )
             self.logger.debug(u"Geogig Commit Merge")
             return True
-
-    def export_conflicts_data(self, branch):
-        if self.conflicts_json:
-            conflicts_dir_path = os.path.join(os.getcwd(), '5_MERGE', 'conflicts_json')
-            path.create_dir(conflicts_dir_path)
-            conflicts_path_file = os.path.join(conflicts_dir_path, u'{0}_{1}.json'.format(datetime.today().strftime('%Y%m%d_%H-%M-%S'), branch))
-            with open(conflicts_path_file, 'w') as outfile:
-                outfile.write(json.dumps(self.conflicts_json))
-            self.logger.debug(u"Geogig export conflicts on json file")
-            self.conflicts_json = { 'conflicts_data' : []}
                 
     def run_process(self):
         count_sucess = 0
@@ -115,7 +101,7 @@ class Server_Merge:
                 self.repository.merge_abort()
                 self.logger.error(u'ERROR MERGE ABORT - BRANCH : {0}'.format(branch))
                 break
-            #self.export_conflicts_data(branch)
+        self.pg_cursor.close()
         self.repository.branches[self.main_branch].show_resume_commit_by_tag(u'merge')
         if len(self.merge_branches) == count_sucess:
             [self.repository.add_branch(branch) for branch in self.merge_branches]

@@ -287,14 +287,6 @@ class Branch(object):
         for layer in layers:
             self.pg_import_layer(layer, schema, host, port, database, user, password)
         self.logger.debug(u"Finished import - database : {0}, user : {1}".format(database, self.name)) if self.logger else ''
-    
-    def clean_all_database(self, host,port,database,user,password):
-        cursor = self.get_pg_cursor(host,port,database,user,password)
-        cursor.execute(u"SELECT public.cgeo_delete_all();")
-        #self.logger.info(u"clean return {0}".format(cursor.fetchall()[0][0])) if self.logger else ''
-        result = cursor.fetchall()[0][0]
-        self.logger.info(u"{1} CLEAN ALL DATABASE : {0}".format(database, 'ERROR' if not(result) else '')) if self.logger else ''
-        cursor.close()
 
     def pg_export_layer(self, layer, schema, host, port, database, user, password):
         try:
@@ -317,7 +309,6 @@ class Branch(object):
     def pg_export_schema(self,host,port,database,schema,user,password):
         self.__checkout()
         layers = []
-        #self.clean_all_database(host,port,database,user,password)
         try:
             listLayersInDb = u'{0}  --repo "{1}" pg list --host {2} --port {3} --database {4} --schema {5} --user {6} --password {7}'.format(
                 self.geogigPath, 
