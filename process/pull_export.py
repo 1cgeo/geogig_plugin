@@ -2,7 +2,6 @@
 import socket, time, sys, os, thread, platform
 from repository import Repository
 from datetime import datetime
-from utils import path
 
  
 class Pull_Export:

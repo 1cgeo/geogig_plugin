@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 class USERS(object):
+        PATH_BACKUP = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), 'bkps')
         ALL_CONFIG = [
             {
                 'database_user_name' : 'postgres',
                 'database_user_password' : 'postgres',
                 'database_schema_name' : 'edgv', 
                 'database_name' : 'base',
-                'bkp_path' : os.path.join(os.getcwd(), '/media/backup_srv'),
+                'bkp_path' : PATH_BACKUP,
                 'machine_ip' : 'localhost',
                 'machine_port' : '5432',
                 'branch_name' : 'reambulacao',
@@ -22,7 +23,7 @@ class USERS(object):
                 'database_user_password' : 'postgres',
                 'database_schema_name' : 'edgv', 
                 'database_name' : 'campos',
-                'bkp_path' : os.path.join(os.getcwd(), '/media/backup_srv'),
+                'bkp_path' : PATH_BACKUP,
                 'machine_ip' : 'localhost',
                 'machine_port' : '5432',
                 'branch_name' : 'campos',
@@ -37,7 +38,7 @@ class USERS(object):
                 'database_user_password' : 'postgres',
                 'database_schema_name' : 'edgv', 
                 'database_name' : 'castro',
-                'bkp_path' : os.path.join(os.getcwd(), '/media/backup_srv'),
+                'bkp_path' : PATH_BACKUP,
                 'machine_ip' : 'localhost',
                 'machine_port' : '5432',
                 'branch_name' : 'castro',
@@ -52,7 +53,7 @@ class USERS(object):
                 'database_user_password' : 'postgres',
                 'database_schema_name' : 'edgv', 
                 'database_name' : 'henrique',
-                'bkp_path' : os.path.join(os.getcwd(), '/media/backup_srv'),
+                'bkp_path' : PATH_BACKUP,
                 'machine_ip' : 'localhost',
                 'machine_port' : '5432',
                 'branch_name' : 'henrique',
@@ -67,7 +68,7 @@ class USERS(object):
                 'database_user_password' : 'postgres',
                 'database_schema_name' : 'edgv', 
                 'database_name' : 'nepomuceno',
-                'bkp_path' : os.path.join(os.getcwd(), '/media/backup_srv'),
+                'bkp_path' : PATH_BACKUP,
                 'machine_ip' : 'localhost',
                 'machine_port' : '5432',
                 'branch_name' : 'nepomuceno',

@@ -2,18 +2,20 @@
 
 import os.path
 import sys
+from ALL_USERS_CONFIG import USERS
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from USER_CONFIG import UserConfig
 from utils import logger, smtp, connection
 from process.backups import Backups
 
-logger, log_path = logger.get_low_logger()
-
 if __name__ == '__main__':
+    n = sys.argv[1]
+    branch = sys.argv[2]
+    date = sys.argv[3]
+    USER = USERS.ALL_CONFIG[int(n)]
+    logger, log_path = logger.get_low_logger(date, branch, 'backup')
     try:
-        USER = UserConfig.USER_CONFIG
         if not connection.check(USER, logger):
             raise Exception(u'Erro conexão')
         bkp = Backups(USER, logger)
