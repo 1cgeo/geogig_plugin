@@ -23,7 +23,8 @@ MERGE_CONFIG = {
                 'nepomuceno',
                 'campos',
                 'henrique',
-                'barbosa'
+                'barbosa',
+                'saraiva'
             ],
     'conflict_db': {
         'database_user_name' : 'postgres',

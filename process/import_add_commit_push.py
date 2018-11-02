@@ -60,15 +60,14 @@ class Import_Add_Commit_Push:
 
 
     def pg_import(self, check_commit=True):
-        ''' result = self.repository.branches[self.branch].isEqualHEADs(
+        result = self.repository.branches[self.branch].isEqualHEADs(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
             self.user_data['database_name'],
             self.user_data['database_user_name'],
             self.user_data['database_user_password']
         )
-        result = True if not(check_commit) else result '''
-        result = True
+        result = True if not(check_commit) else result
         if result:
             self.logger.debug(u"Geogig Import - user : {}".format(self.branch)) if self.logger else ''
             self.repository.branches[self.branch].pg_import_schema(   

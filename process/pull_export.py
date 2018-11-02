@@ -28,25 +28,27 @@ class Pull_Export:
     
     def export(self):
         result = True
-        self.logger.debug(u"Geogig Export - user : {0}".format(self.branch)) if self.logger else ''
-        self.repository.branches[self.branch].pg_export_schema(
-            self.user_data['machine_ip'],
-            self.user_data['machine_port'],
-            self.user_data['database_name'],
-            self.user_data['database_schema_name'],
-            self.user_data['database_user_name'],
-            self.user_data['database_user_password']
-        )
-        self.logger.debug(u"Geogig Import - user : {0}".format(self.branch)) if self.logger else ''
-        self.repository.branches[self.branch].pg_import_schema(   
+        for i in range(1, 3):
+            self.logger.debug(u"Geogig Export {} - user : {}".format(i, self.branch)) if self.logger else ''
+            self.repository.branches[self.branch].pg_export_schema(
                 self.user_data['machine_ip'],
                 self.user_data['machine_port'],
                 self.user_data['database_name'],
                 self.user_data['database_schema_name'],
                 self.user_data['database_user_name'],
                 self.user_data['database_user_password']
-        )
-        count_list = len(self.repository.branches[self.branch].get_all_data_staging_work())
+            )
+            self.logger.debug(u"Geogig Import {} - user : {}".format(i, self.branch)) if self.logger else ''
+            self.repository.branches[self.branch].pg_import_schema(   
+                    self.user_data['machine_ip'],
+                    self.user_data['machine_port'],
+                    self.user_data['database_name'],
+                    self.user_data['database_schema_name'],
+                    self.user_data['database_user_name'],
+                    self.user_data['database_user_password']
+            )
+            count_list = len(self.repository.branches[self.branch].get_all_data_staging_work())
+            break if count_list == 0 else ''
         if count_list > 0 :
             self.logger.error(u'EXPORT FAILED! USER : {0}'.format(self.branch))
             self.logger.debug(u"STATUS : {0}".format(self.repository.branches[self.branch].status())) if self.logger else ''
