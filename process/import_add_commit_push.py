@@ -11,7 +11,7 @@ class Import_Add_Commit_Push:
         self.do_push = push
         self.user_data = config
         self.branch = self.user_data['branch_name']
-        self.geogig_path = path.get_geogig_path()
+        self.geogig_path = self.get_geogig_path()
         self.repository = Repository(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
@@ -23,6 +23,15 @@ class Import_Add_Commit_Push:
             self.geogig_path,
             self.logger
         )
+    
+    def get_geogig_path(self):
+        geogig_path = os.path.join(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+            'geogig_bin',
+            'bin',
+            'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
+        )
+        return geogig_path
 
     def connectPsycopg2(self):
         conn = psycopg2.connect(

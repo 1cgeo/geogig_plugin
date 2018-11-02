@@ -15,7 +15,7 @@ class Server_Merge:
         self.conflict_db = conflict_db
         self.EPSG = epsg
         self.pg_cursor = self.connectPsycopg2()
-        geogig_path = path.get_geogig_path()
+        geogig_path = self.get_geogig_path()
         self.repository = Repository(
             self.base_repo['machine_ip'],
             self.base_repo['machine_port'],
@@ -27,6 +27,15 @@ class Server_Merge:
             geogig_path,
             self.logger
         )
+
+    def get_geogig_path(self):
+        geogig_path = os.path.join(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+            'geogig_bin',
+            'bin',
+            'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
+        )
+        return geogig_path
 
     def connectPsycopg2(self):
         conn = psycopg2.connect(

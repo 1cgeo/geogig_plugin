@@ -13,7 +13,7 @@ class Pull_Export:
         self.user_data = config
         self.pull = pull
         self.branch = self.user_data['branch_name']
-        geogig_path = path.get_geogig_path()
+        geogig_path = self.get_geogig_path()
         self.repository = Repository(
             self.user_data['machine_ip'],
             self.user_data['machine_port'],
@@ -26,6 +26,15 @@ class Pull_Export:
             self.logger
         )
     
+    def get_geogig_path(self):
+        geogig_path = os.path.join(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+            'geogig_bin',
+            'bin',
+            'geogig' if  platform.system() == 'Linux' else 'geogig.bat'
+        )
+        return geogig_path
+
     def export(self):
         result = True
         for i in range(1, 3):

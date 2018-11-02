@@ -2,15 +2,13 @@
 import socket, time, sys, os, platform
 from repository import Repository
 from datetime import datetime
-from utils import path
  
 class Backups:
    
     def __init__(self, config, logger=False):
         self.logger = logger
         self.user_data = config
-        geogig_path = path.get_geogig_path()
-        path.create_dir(self.user_data['bkp_path'])
+        self.create_dir(self.user_data['bkp_path'])
         self.pg_dump_path = u"{0}".format(
             u'export PGPASSWORD="{0}"; pg_dump'.format(self.user_data['database_user_password']) 
             if  platform.system() == 'Linux' 
@@ -21,6 +19,10 @@ class Backups:
         )
         self.logger.debug(u"PG_DUMP_PATH : {0} user : {1}".format(self.pg_dump_path, self.user_data['branch_name']))
         self.os = os
+
+    def create_dir(self, path):
+        if not(os.path.exists(path)):
+            os.mkdir(path)
     
     def bkp_production_db(self):
         self.logger.info(
@@ -48,7 +50,7 @@ class Backups:
         )
         self.logger.debug(u"Backup database cmd : {0} - user : {1}".format(cmd, self.user_data['branch_name']))
         self.os.popen(cmd)
-        return path.exist(backup_path)
+        return os.path.exists(backup_path)
       
     def bkp_repository_db(self):
         self.logger.info(
@@ -76,11 +78,10 @@ class Backups:
         )
         self.logger.debug(u"Backup repository cmd : {0} - user : {1}".format(cmd, self.user_data['branch_name']))
         self.os.popen(cmd)
-        return path.exist(backup_path)
+        return os.path.exists(backup_path)
  
     def run_process(self):
         self.logger.info(u"Init Backups - user  : {0}".format(self.user_data['branch_name']))
-        path.create_dir(self.user_data['bkp_path'])
         result_b1 = self.bkp_production_db()
         result_b2 = self.bkp_repository_db()
         if result_b1 and result_b2:
