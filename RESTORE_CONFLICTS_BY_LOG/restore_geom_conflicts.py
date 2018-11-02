@@ -2,7 +2,7 @@ import os, json, psycopg2
 
 LOG_NAME = '20181031_22-08-54.log'
 
-f = open(os.path.join(os.getcwd(), '..', 'logs', LOG_NAME))
+f = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), 'logs', LOG_NAME))
 data =  f.readlines()
 
 def connectPsycopg2():
