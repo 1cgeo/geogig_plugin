@@ -2,20 +2,18 @@
 
 import os.path
 import sys
+from ALL_USERS_CONFIG import USERS
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from USER_CONFIG import UserConfig
 from utils import logger, smtp, connection
 from process.pull_export import Pull_Export
-
-logger, log_path = logger.get_low_logger()
 
 if __name__ == '__main__':
     n = sys.argv[1]
     branch = sys.argv[2]
     date = sys.argv[3]
-    BASE = USERS.ALL_CONFIG[n]
+    BASE = USERS.ALL_CONFIG[int(n)]
     logger, log_path = logger.get_low_logger(date, branch, 'export')
     try:
         

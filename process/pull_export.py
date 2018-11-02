@@ -56,7 +56,9 @@ class Pull_Export:
                     self.user_data['database_user_password']
             )
             count_list = len(self.repository.branches[self.branch].get_all_data_staging_work())
-            break if count_list == 0 else ''
+            if count_list == 0:
+                break
+            self.repository.branches[self.branch].clean_staging_area()
         if count_list > 0 :
             self.logger.error(u'EXPORT FAILED! USER : {0}'.format(self.branch))
             self.logger.debug(u"STATUS : {0}".format(self.repository.branches[self.branch].status())) if self.logger else ''

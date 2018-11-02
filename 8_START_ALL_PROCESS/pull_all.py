@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import socket, time, sys, os, thread, platform
+from ALL_USERS_CONFIG import USERS
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from process.repository import Repository
 from datetime import datetime
+from utils import logger, smtp, connection
 
  
 class Pull_Export:
@@ -46,17 +49,17 @@ if __name__ == '__main__':
     date = sys.argv[3]
     USER = USERS.ALL_CONFIG[int(n)]
     logger, log_path = logger.get_low_logger(date, branch, 'pull')
-    try:
-        if not connection.check(USER, logger):
-            raise Exception(u'Erro conexão')
-        process = Pull_Export(USER, logger)
-        result = process.run_process()
-        if result:
-            logger.info(u"Pull e Export finalizado sem erros")
-        else:
-            logger.error(u"Erro no processo de Pull/Export")
-    except Exception as e:
-        logger.error(e)
-    finally:
-        pass
+    #try:
+    if not connection.check(USER, logger):
+        raise Exception(u'Erro conexão')
+    process = Pull_Export(USER, logger)
+    result = process.run_process()
+    if result:
+        logger.info(u"Pull finalizado sem erros")
+    else:
+        logger.error(u"Erro no processo de Pull")
+    #except Exception as e:
+    #    logger.error(e)
+    #finally:
+    #    pass
         #smtp.send_email_with_attach(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], 'Pull_Export', log_path)

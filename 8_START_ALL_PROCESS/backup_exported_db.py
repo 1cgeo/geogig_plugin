@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import socket, time, sys, os, thread, platform
+from ALL_USERS_CONFIG import USERS
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from datetime import datetime
+from utils import logger, smtp, connection
+
 
  
-class Restore_Databases:
+class Backup_Exported_Database:
    
     def __init__(self, config, logger=False):
         self.logger = logger
@@ -57,12 +60,12 @@ if __name__ == '__main__':
     try:
         if not connection.check(USER, logger):
             raise Exception(u'Erro conexão')
-        process = Pull_Export(USER, logger)
+        process = Backup_Exported_Database(USER, logger)
         result = process.run_process()
         if result:
-            logger.info(u"Pull e Export finalizado sem erros")
+            logger.info(u"Backup da BASE finalizado sem erros")
         else:
-            logger.error(u"Erro no processo de Pull/Export")
+            logger.error(u"Erro no processo de Backup da BASE")
     except Exception as e:
         logger.error(e)
     finally:
