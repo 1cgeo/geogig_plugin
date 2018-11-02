@@ -32,51 +32,6 @@ class USERS(object):
                 'repository_name' : 'rs_rf1_repo',
                 'pg_dump_path_windows' : 'c:\\Program Files\\PostgreSQL\\10\\bin\\pg_dump.exe',
                 
-            },
-            {
-                'database_user_name' : 'postgres',
-                'database_user_password' : 'postgres',
-                'database_schema_name' : 'edgv', 
-                'database_name' : 'castro',
-                'bkp_path' : PATH_BACKUP,
-                'machine_ip' : 'localhost',
-                'machine_port' : '5432',
-                'branch_name' : 'castro',
-                'repository_db_name' : 'castro_repo',
-                'repository_schema_name' : 'repositorios',
-                'repository_name' : 'rs_rf1_repo',
-                'pg_dump_path_windows' : 'c:\\Program Files\\PostgreSQL\\10\\bin\\pg_dump.exe',
-                
-            },
-            {
-                'database_user_name' : 'postgres',
-                'database_user_password' : 'postgres',
-                'database_schema_name' : 'edgv', 
-                'database_name' : 'henrique',
-                'bkp_path' : PATH_BACKUP,
-                'machine_ip' : 'localhost',
-                'machine_port' : '5432',
-                'branch_name' : 'henrique',
-                'repository_db_name' : 'henrique_repo',
-                'repository_schema_name' : 'repositorios',
-                'repository_name' : 'rs_rf1_repo',
-                'pg_dump_path_windows' : 'c:\\Program Files\\PostgreSQL\\10\\bin\\pg_dump.exe',
-                
-            },
-            {
-                'database_user_name' : 'postgres',
-                'database_user_password' : 'postgres',
-                'database_schema_name' : 'edgv', 
-                'database_name' : 'nepomuceno',
-                'bkp_path' : PATH_BACKUP,
-                'machine_ip' : 'localhost',
-                'machine_port' : '5432',
-                'branch_name' : 'nepomuceno',
-                'repository_db_name' : 'nepomuceno_repo',
-                'repository_schema_name' : 'repositorios',
-                'repository_name' : 'rs_rf1_repo',
-                'pg_dump_path_windows' : 'c:\\Program Files\\PostgreSQL\\10\\bin\\pg_dump.exe',
-                
             }
             
         ]

@@ -19,10 +19,9 @@ MERGE_CONFIG = {
             'base' : True
     },
     'branches': [
-                'castro',
-                'nepomuceno',
+                #'nepomuceno',
                 'campos',
-                'henrique',
+                #'henrique',
             ],
     'conflict_db': {
         'database_user_name' : 'postgres',

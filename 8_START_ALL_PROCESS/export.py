@@ -15,20 +15,17 @@ if __name__ == '__main__':
     n = sys.argv[1]
     branch = sys.argv[2]
     date = sys.argv[3]
-    BASE = False
-    for USER in USERS.ALL_CONFIG
-        if 'BASE' in USER and USER['BASE']:
-            BASE = USER
-    logger, log_path = logger.get_low_logger(date, branch, 'commit')
+    BASE = USERS.ALL_CONFIG[n]
+    logger, log_path = logger.get_low_logger(date, branch, 'export')
     try:
-        if BASE:
-            if not connection.check(BASE, logger):
-                raise Exception(u'Erro conexão')
-            process = Pull_Export(BASE, False, logger)
-            result = process.run_process()
-            if result:
-                logger.info(u"Pull e Export finalizado sem erros")
-        if not(result) or not(BASE):
+        
+        if not connection.check(BASE, logger):
+            raise Exception(u'Erro conexão')
+        process = Pull_Export(BASE, False, logger)
+        result = process.run_process()
+        if result:
+            logger.info(u"Pull e Export finalizado sem erros")
+        else:
             logger.error(u"Erro no processo de Pull/Export")
     except Exception as e:
         logger.error(e)
