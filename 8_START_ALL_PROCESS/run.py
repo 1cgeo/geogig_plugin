@@ -68,7 +68,7 @@ if __name__ == '__main__':
             steps = get_steps(proc, not_base=True)
         else:
             steps = get_steps(proc)
-        pool = Pool(processes=3)
+        pool = Pool(processes=4)
         pool.map(run_process, steps)
         pool.close()
         if validate_step(tag_process):

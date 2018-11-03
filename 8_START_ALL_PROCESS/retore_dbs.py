@@ -72,12 +72,28 @@ class Restore_Databases:
         )
         result = subprocess.check_output(cmd,shell=True)
         self.logger.info(u"Date modification database: {0}, user : {1}\n{2}".format(dbname, branch, result))
+
+    def sync_ids(self):
+        dbname = self.user_data['database_name']
+        branch = self.user_data['branch_name']
+        query =  u'''select cgeo_sync_ids_after_export('{}');'''.format(branch)
+        cmd = u'''{psql} -U {name} -h {m_ip} -p {m_port} -d {db_name} << EOF\n{query}\nEOF'''.format(
+            name = self.user_data['database_user_name'],
+            m_ip = self.user_data['machine_ip'],
+            m_port = self.user_data['machine_port'],
+            db_name = dbname,
+            query = query,
+            psql=self.psql_path
+        )
+        result = subprocess.check_output(cmd,shell=True)
+        self.logger.info(u"Sync ids database: {0}, user : {1}\n{2}".format(dbname, branch, result))
       
     def run_process(self):
         self.logger.info(u"Drop/Create/Restore - user  : {0}".format(self.user_data['branch_name']))
         self.drop_create_db()
         self.restore_exported_db()
         self.show_date_modification()
+        self.sync_ids()
              
 if __name__ == '__main__':
     n = sys.argv[1]
