@@ -23,7 +23,10 @@ class Restore_Databases:
 
     def create_dir(self, path):
         if not(os.path.exists(path)):
-            os.mkdir(path)
+            try:
+                os.mkdir(path)
+            except:
+                pass
     
     def restore_exported_db(self):
         dbname = self.user_data['database_name'] 

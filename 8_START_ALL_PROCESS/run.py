@@ -53,7 +53,6 @@ if __name__ == '__main__':
     pull_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), '8_START_ALL_PROCESS', 'pull_all.py')
     backup_exported_db_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), '8_START_ALL_PROCESS', 'backup_exported_db.py')
     restore_all_dbs_users = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), '8_START_ALL_PROCESS', 'retore_dbs.py')
-    
     #PYTHON
     echo = [sys.executable]
     #START ALL PROCESSES
@@ -68,7 +67,7 @@ if __name__ == '__main__':
             steps = get_steps(proc, not_base=True)
         else:
             steps = get_steps(proc)
-        pool = Pool(processes=4)
+        pool = Pool(processes=6)
         pool.map(run_process, steps)
         pool.close()
         if validate_step(tag_process):

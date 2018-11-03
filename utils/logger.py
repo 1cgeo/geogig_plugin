@@ -4,8 +4,11 @@ from datetime import datetime
 
 def create_dir(path):
     if not(os.path.exists(path)):
-        os.mkdir(path)
-
+        try:
+            os.mkdir(path)
+        except:
+            pass
+            
 def get_low_logger(date='', branch='', step=''):
     formatter = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     log_path_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), 'logs')

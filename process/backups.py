@@ -22,7 +22,10 @@ class Backups:
 
     def create_dir(self, path):
         if not(os.path.exists(path)):
-            os.mkdir(path)
+            try:
+                os.mkdir(path)
+            except:
+                pass
     
     def bkp_production_db(self):
         self.logger.info(
