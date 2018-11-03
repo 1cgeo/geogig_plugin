@@ -130,7 +130,8 @@ class Import_Add_Commit_Push:
                 self.user_data['database_user_password'],
                 u'COMMIT'
             )
-            self.insert_summary_on_db()
+            if 'commit_summary' in self.user_data:
+                self.insert_summary_on_db()
         else:
             self.logger.info(u'Nothing to commit on {0}'.format(self.branch)) if self.logger else '' 
         self.repository.branches[self.branch].show_resume_commit_by_tag(u'commit')
