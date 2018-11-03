@@ -41,13 +41,13 @@ def import_add_commit_push(server, users):
     result = process.run_process()
     if not(result):
         return False, server["machine_ip"]
-    #smtp.send_email(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Import', 'Finalizado servidor {0}'.format(server["branch_name"]))
+    #smtp.send_email(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Import', 'Finalizado servidor {0}'.format(server["branch_name"]))
     for user in users:
         process = Import_Add_Commit_Push(user, True, logger)
         result = process.run_process()
         if not(result):
             return False, user["machine_ip"]
-        #smtp.send_email(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Import', 'Finalizado usuário {0}'.format(user["branch_name"]))
+        #smtp.send_email(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Import', 'Finalizado usuário {0}'.format(user["branch_name"]))
     return True, True
 
 def pull_export(server, users):
@@ -55,13 +55,13 @@ def pull_export(server, users):
     result = process.run_process()
     if not(result):
         return False, server["machine_ip"]
-    #smtp.send_email(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Export', 'Finalizado servidor {0}'.format(server["branch_name"]))
+    #smtp.send_email(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Export', 'Finalizado servidor {0}'.format(server["branch_name"]))
     for user in users:
         process = Pull_Export(user, True, logger)
         result = process.run_process()
         if not(result):
             return False, user["machine_ip"]
-        #smtp.send_email(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Export', 'Finalizado usuário {0}'.format(user["branch_name"]))
+        #smtp.send_email(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Export', 'Finalizado usuário {0}'.format(user["branch_name"]))
     return True, True
 
 
@@ -76,7 +76,7 @@ if __name__ == '__main__':
             logger.error(u"Erro no backup do usuário {0}", user_error_bkp)
             raise BackupError()
         logger.info(u"Backup finalizado com sucesso!")
-        #smtp.send_email(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Backup', 'Todos os backups finalizados')
+        #smtp.send_email(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Backup', 'Todos os backups finalizados')
 
         imp, imp_error = import_add_commit_push(MERGE_CONFIG['server'], USERS_CONFIG)
         if not imp:
@@ -93,13 +93,13 @@ if __name__ == '__main__':
         if not result:
             logger.error(u"Erro no processo de Merge")
             raise MergeError()
-        #smtp.send_email(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Merge', 'Todos os merges finalizados')
+        #smtp.send_email(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Merge', 'Todos os merges finalizados')
 
         exp, exp_error = pull_export(MERGE_CONFIG['server'], USERS_CONFIG)
         if not exp:
             logger.error(u"Erro de export do usuário {0}", imp_error)
             raise ExportError()
-        #smtp.send_email(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Export', 'Todos os exports finalizados')
+        #smtp.send_email(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], run_time, 'Batch_Process_Export', 'Todos os exports finalizados')
 
 
         logger.info(u"Processo finalizado com sucesso!")
@@ -108,4 +108,4 @@ if __name__ == '__main__':
     except BackupError:
         logger.error(u"Não foi possível de realizar o backup em todos os usuários")
     finally:
-        #smtp.send_email_with_attach(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], 'Batch_Process', log_path)
+        #smtp.send_email_with_attach(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "diniz.ime@gmail.com","cesar.soares@gmail.com"], 'Batch_Process', log_path)

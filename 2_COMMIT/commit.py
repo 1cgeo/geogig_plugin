@@ -26,4 +26,4 @@ if __name__ == '__main__':
         logger.error(e)
     finally:
         pass
-        #smtp.send_email_with_attach(u"desenv.1dl@gmail.com", u"desenv1dl", [u"desenv.1dl@gmail.com", "cesar.soares@gmail.com"], 'Commit', log_path)
+        #smtp.send_email_with_attach(u"desenv.1dl@gmail.com", u"PASSWORD", [u"desenv.1dl@gmail.com", "cesar.soares@gmail.com"], 'Commit', log_path)
