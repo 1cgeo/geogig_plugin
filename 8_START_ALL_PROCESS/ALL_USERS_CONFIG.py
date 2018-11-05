@@ -5,7 +5,7 @@ class USERS(object):
         BD_COMMIT_SUMMARY = {
             'database_user_name' : 'postgres',
             'database_user_password' : 'postgres',
-            'database_name' : 'rs_rf1',
+            'database_name' : 'repositorio_lote3',
             'machine_ip' : '10.2.1.18',
             'machine_port' : '5432'
         }
